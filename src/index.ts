@@ -1,28 +1,77 @@
-import * as dotenv from "dotenv";
-import { getRootAgent } from "./agents/agent";
+import { intro, outro, text, confirm, spinner } from "@clack/prompts";
+import {
+  blue,
+  green,
+  red,
+  cyan,
+  bgRed,
+  bold,
+  magenta,
+  yellow,
+} from "picocolors";
+import { getRootAgent } from "./agents/agent.js";
 
-dotenv.config();
+async function runSession() {
+  console.log(
+    cyan(`
+ █████╗ ██████╗ ██╗  ██╗    ███╗   ███╗ █████╗  ██████╗██╗  ██╗██╗███╗   ██╗ █████╗
+██╔══██╗██╔══██╗██║ ██╔╝    ████╗ ████║██╔══██╗██╔════╝██║  ██║██║████╗  ██║██╔══██╗
+███████║██║  ██║█████╔╝     ██╔████╔██║███████║██║     ███████║██║██╔██╗ ██║███████║
+██╔══██║██║  ██║██╔═██╗     ██║╚██╔╝██║██╔══██║██║     ██╔══██║██║██║╚██╗██║██╔══██║
+██║  ██║██████╔╝██║  ██╗    ██║ ╚═╝ ██║██║  ██║╚██████╗██║  ██║██║██║ ╚████║██║  ██║
+╚═╝  ╚═╝╚═════╝ ╚═╝  ╚═╝    ╚═╝     ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝
+  `),
+  );
+  console.log(
+    magenta(
+      "                           🎮 " +
+        bold("Educational GAMING AI SYSTEM") +
+        " 🔥",
+    ),
+  );
+  console.log(
+    yellow("                              💯 Learn with the Agent! 💯\n"),
+  );
 
-async function main() {
-  console.log("🚀 AI Agent System");
-  
-  const { runner } = await getRootAgent();
-  
-  const args = process.argv.slice(2);
-  const question = args.join(" ");
-  
-  if (!question) {
-    console.log("Usage: pnpm start \"your question here\"");
+  intro(cyan("🕹️ Ask me anything!"));
+
+  const question = await text({
+    message: "What is your question?",
+    placeholder: "Enter your question...",
+    validate: (value) => (value ? undefined : "Please enter a question"),
+  });
+
+  if (!question || typeof question !== "string") {
+    outro(red("❌ No question provided"));
     return;
   }
-  
+
+  const s = spinner();
+  s.start(blue("Processing..."));
+
   try {
-    console.log(`Question: ${question}`);
+    const { runner } = await getRootAgent();
     const response = await runner.ask(question);
-    console.log(`Response: ${response}`);
+
+    s.stop(green("✅ Done!"));
+    console.log("\n" + cyan("📝 Response:"));
+    console.log(response);
+
+    const continueSession = await confirm({ message: "Ask another question?" });
+    if (continueSession) {
+      console.log("\n");
+      await runSession();
+    } else {
+      outro(green("👋 Goodbye!"));
+    }
   } catch (error) {
-    console.error(`Error: ${error}`);
+    s.stop(red("❌ Error"));
+    console.error(
+      red("Error:"),
+      error instanceof Error ? error.message : "Unknown",
+    );
+    outro(red("Session ended"));
   }
 }
 
-main().catch(console.error);
+runSession().catch(console.error);
