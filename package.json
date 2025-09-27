@@ -39,7 +39,6 @@
     "node-fetch": "^3.3.2",
     "picocolors": "^1.1.1",
     "puppeteer": "^24.22.3",
-    "synthik-client": "^0.1.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
