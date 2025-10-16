@@ -44,3 +44,4 @@ package-lock.json
 
 # config
 components.json
+public/uploads/

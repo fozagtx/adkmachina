@@ -22,16 +22,19 @@ import {
   AlertTriangle,
   ArrowUp,
   Copy,
+  Paperclip,
   ThumbsDown,
   ThumbsUp,
+  X,
 } from "lucide-react";
-import { memo, useState } from "react";
-import { askAgent } from "../_actions";
+import { memo, useRef, useState } from "react";
+import { askAgent, uploadVideo } from "../_actions";
 
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
+  videoPath?: string;
 };
 
 type MessageComponentProps = {
@@ -131,39 +134,75 @@ const ErrorMessage = memo(({ error }: { error: string }) => (
 
 ErrorMessage.displayName = "ErrorMessage";
 
-/**
- * Agent Chat Component
- *
- * A professional chat interface for interacting with the ADK root agent.
- * Uses server actions to communicate with the agent, maintaining a message
- * history and providing a modern chat experience.
- */
 export default function AgentChat() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadedVideoPath, setUploadedVideoPath] = useState<string | null>(
+    null,
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("video/")) {
+      setError("Please upload a video file");
+      return;
+    }
+
+    setUploadedFile(file);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const data = await uploadVideo(formData);
+
+      if (data.success) {
+        setUploadedVideoPath(data.path);
+      } else {
+        setError("Failed to upload video");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError("Failed to upload video");
+    }
+  };
+
+  const clearFile = () => {
+    setUploadedFile(null);
+    setUploadedVideoPath(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = async () => {
-    if (!input.trim() || isLoading) return;
+    if ((!input.trim() && !uploadedVideoPath) || isLoading) return;
+
+    const messageContent = uploadedFile
+      ? `${input.trim()}\n[Video uploaded: ${uploadedFile.name}]`
+      : input.trim();
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: input.trim(),
+      content: messageContent,
+      videoPath: uploadedVideoPath || undefined,
     };
 
-    // Add user message to chat
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
     setError(null);
 
     try {
-      // Call the agent using server action
-      const result = await askAgent(userMessage.content);
+      const result = await askAgent(userMessage.content, uploadedVideoPath);
 
-      // Add assistant response to chat
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -171,6 +210,7 @@ export default function AgentChat() {
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
+      clearFile();
     } catch (err) {
       console.error("Error:", err);
       setError(
@@ -188,18 +228,21 @@ export default function AgentChat() {
           {messages.length === 0 && (
             <div className="mx-auto w-full max-w-3xl shrink-0 px-3 pb-3 md:px-5 md:pb-5">
               <div className="text-foreground mb-4 text-2xl font-semibold">
-                Welcome to Agent Chat
+                Welcome to Video Memory Agent
               </div>
               <div className="text-muted-foreground mb-2 font-medium">
                 Try asking:
               </div>
               <ul className="text-muted-foreground list-inside list-disc space-y-1">
-                <li>Tell me a joke about programming</li>
-                <li>What's the weather like?</li>
-                <li>Give me a dad joke</li>
+                <li>
+                  Upload a video and ask to clip it from 00:00:10 for 5 seconds
+                </li>
+                <li>Give me ideas for birthday video moments</li>
+                <li>What should I capture on my vacation?</li>
               </ul>
             </div>
           )}
+
           {messages.map((message, index) => {
             const isLastMessage = index === messages.length - 1;
             return (
@@ -210,10 +253,12 @@ export default function AgentChat() {
               />
             );
           })}
+
           {isLoading && <LoadingMessage />}
           {error && <ErrorMessage error={error} />}
         </ChatContainerContent>
       </ChatContainerRoot>
+
       <div className="inset-x-0 bottom-0 mx-auto w-full max-w-3xl shrink-0 px-3 pb-3 md:px-5 md:pb-5">
         <PromptInput
           isLoading={isLoading}
@@ -223,16 +268,49 @@ export default function AgentChat() {
           className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
         >
           <div className="flex flex-col">
+            {uploadedFile && (
+              <div className="mx-2 mt-2 flex items-center gap-2 rounded-lg bg-muted px-3 py-2">
+                <Paperclip size={16} />
+                <span className="flex-1 truncate text-sm">
+                  {uploadedFile.name}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-6"
+                  onClick={clearFile}
+                >
+                  <X size={14} />
+                </Button>
+              </div>
+            )}
             <PromptInputTextarea
-              placeholder="Ask your agent anything..."
+              placeholder="Ask your agent anything or upload a video to clip..."
               className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
             />
             <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 p-2">
-              <div />
+              <div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                >
+                  <Paperclip size={18} />
+                </Button>
+              </div>
               <div className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  disabled={!input.trim() || isLoading}
+                  disabled={(!input.trim() && !uploadedVideoPath) || isLoading}
                   onClick={handleSubmit}
                   className="size-9 rounded-full"
                 >
