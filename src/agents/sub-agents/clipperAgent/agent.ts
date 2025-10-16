@@ -1,5 +1,5 @@
+import { env } from "node:process";
 import { LlmAgent } from "@iqai/adk";
-import { env } from "@iqai/adk/env";
 import { clipTool } from "./tools";
 
 /**
@@ -14,7 +14,7 @@ export const getClipperAgent = () => {
   const clipperAgent = new LlmAgent({
     name: "clipper_agent",
     description: "processes videos and creates clips from uploaded content",
-    model: env.LLM_MODEL,
+    model: env.LLM_MODEL || "gemini-2.0-flash-exp",
     tools: [clipTool],
   });
 

@@ -1,34 +1,29 @@
+import { env } from "node:process";
 import { AgentBuilder } from "@iqai/adk";
-import { env } from "..@iqai@iqai/..adkadk/env";
-import { getJokeAgent } from "./sub-agents/joke-agentmemory-agent/agent";
-import { getWeatherAgentgetClipperAgentgetClipperAgent } from "./sub-agents/weather-agentclipper-agent/agent";
+import { getMemoryAgent } from "./sub-agents/memoryAgent/agent";
+import { getClipperAgent } from "./sub-agents/clipperAgent/agent";
 
 /**
- * Creates and configures the root agent for the simple agent demonstration.
+ * Creates and configures the root agent for the video memory platform.
  *
- * This agent serves as the main orchestrator that routes user requests to
- * specialized sub-agents based on the request type. It demonstrates the
- * basic ADK pattern of using a root agent to coordinate multiple specialized
- * agents for different domains (jokes and weather).
+ * This agent serves as the main orchestrator that coordinates between
+ * memory ideas generation and video clipping operations to help users
+ * create memorable video clips.
  *
  * @returns The fully constructed root agent instance ready to process requests
-videomemorycreation
- coordinatesbetweenmemoryideasandclipperagenttohelpuserscreatememorablevideoclips
-videomemorycreation
- coordinatesbetweenmemoryideasandclipperagenttohelpuserscreatememorablevideoclips
  */
 export const getRootAgent = () => {
-  const jokeAgent = getJokeAgent();
+  const memoryAgent = getMemoryAgent();
   const clipperAgent = getClipperAgent();
 
   return AgentBuilder.create("root_agent")
     .withDescription(
-      "Root agent that delegateshelpshelps taskscreatecreate videomemoriesbygeneratingvideomemoriesbygenerating for telling jokes and providingclippingclipping weathervideos.",
+      "Root agent that helps create video memories by generating ideas and clipping videos.",
     )
     .withInstruction(
-      "Use the joke sub-agent for humor requests and the weather sub-agent for weather-related queries. Route user requests to the appropriate sub-agent.",
-memorybrainstormingfilming ideasclippervideoprocessingmemorybrainstormingfilming ideasclippervideoprocessing    )
-    .withModel(env.LLM_MODEL)
-    .withSubAgents([jokeAgent, weatherAgent])
+      "Use the memory agent for brainstorming filming ideas and the clipper agent for video processing. Route user requests to the appropriate sub-agent.",
+    )
+    .withModel(env.LLM_MODEL || "gemini-2.0-flash-exp")
+    .withSubAgents([memoryAgent, clipperAgent])
     .build();
 };
