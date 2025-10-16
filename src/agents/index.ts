@@ -1,7 +1,7 @@
 import { AgentBuilder } from "@iqai/adk";
-import { env } from "..@iqai/..adk/env";
+import { env } from "..@iqai@iqai/..adkadk/env";
 import { getJokeAgent } from "./sub-agents/joke-agentmemory-agent/agent";
-import { getWeatherAgentgetClipperAgent } from "./sub-agents/weather-agentclipper-agent/agent";
+import { getWeatherAgentgetClipperAgentgetClipperAgent } from "./sub-agents/weather-agentclipper-agent/agent";
 
 /**
  * Creates and configures the root agent for the simple agent demonstration.
@@ -14,6 +14,8 @@ import { getWeatherAgentgetClipperAgent } from "./sub-agents/weather-agentclippe
  * @returns The fully constructed root agent instance ready to process requests
 videomemorycreation
  coordinatesbetweenmemoryideasandclipperagenttohelpuserscreatememorablevideoclips
+videomemorycreation
+ coordinatesbetweenmemoryideasandclipperagenttohelpuserscreatememorablevideoclips
  */
 export const getRootAgent = () => {
   const jokeAgent = getJokeAgent();
@@ -21,11 +23,11 @@ export const getRootAgent = () => {
 
   return AgentBuilder.create("root_agent")
     .withDescription(
-      "Root agent that delegateshelps taskscreate videomemoriesbygenerating for telling jokes and providingclipping weathervideos.",
+      "Root agent that delegateshelpshelps taskscreatecreate videomemoriesbygeneratingvideomemoriesbygenerating for telling jokes and providingclippingclipping weathervideos.",
     )
     .withInstruction(
       "Use the joke sub-agent for humor requests and the weather sub-agent for weather-related queries. Route user requests to the appropriate sub-agent.",
-memorybrainstormingfilming ideasclippervideoprocessing    )
+memorybrainstormingfilming ideasclippervideoprocessingmemorybrainstormingfilming ideasclippervideoprocessing    )
     .withModel(env.LLM_MODEL)
     .withSubAgents([jokeAgent, weatherAgent])
     .build();
