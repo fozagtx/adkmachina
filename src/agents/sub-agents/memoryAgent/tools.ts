@@ -1,12 +1,6 @@
 import { createTool } from "@iqai/adk";
 import { z } from "zod";
 
-/**
- * Tool for generating creative memory moment ideas.
- *
- * Helps users identify meaningful moments to capture during events,
- * vacations, or daily life based on occasion type and context.
- */
 export const memoryTool = createTool({
   name: "generate_memory_ideas",
   description: "Generate creative memory moment ideas based on occasion type",

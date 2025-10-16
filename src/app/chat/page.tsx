@@ -28,7 +28,8 @@ import {
   X,
 } from "lucide-react";
 import { memo, useRef, useState } from "react";
-import { askAgent, uploadVideo } from "../_actions";
+import { askAgent } from "../_actions";
+import { ClippingAnimation } from "@/components/clipping-animation";
 
 type ChatMessage = {
   id: string;
@@ -42,7 +43,7 @@ type MessageComponentProps = {
   isLastMessage: boolean;
 };
 
-export const MessageComponent = memo(
+const MessageComponent = memo(
   ({ message, isLastMessage }: MessageComponentProps) => {
     const isAssistant = message.role === "assistant";
 
@@ -107,8 +108,6 @@ export const MessageComponent = memo(
   },
 );
 
-MessageComponent.displayName = "MessageComponent";
-
 const LoadingMessage = memo(() => (
   <Message className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
     <div className="group flex w-full flex-col gap-0">
@@ -118,8 +117,6 @@ const LoadingMessage = memo(() => (
     </div>
   </Message>
 ));
-
-LoadingMessage.displayName = "LoadingMessage";
 
 const ErrorMessage = memo(({ error }: { error: string }) => (
   <Message className="not-prose mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
@@ -132,9 +129,7 @@ const ErrorMessage = memo(({ error }: { error: string }) => (
   </Message>
 ));
 
-ErrorMessage.displayName = "ErrorMessage";
-
-export default function AgentChat() {
+export default function ChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -143,6 +138,7 @@ export default function AgentChat() {
   const [uploadedVideoPath, setUploadedVideoPath] = useState<string | null>(
     null,
   );
+  const [isClipping, setIsClipping] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -160,16 +156,28 @@ export default function AgentChat() {
     formData.append("file", file);
 
     try {
-      const data = await uploadVideo(formData);
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (data.success) {
+      const data = await response.json();
+
+      if (data.success && data.path) {
         setUploadedVideoPath(data.path);
+        console.log("Video uploaded successfully:", data);
       } else {
-        setError("Failed to upload video");
+        const errorMsg = data.error || "Failed to upload video";
+        console.error(errorMsg, data);
+        setError(errorMsg);
+        setUploadedFile(null);
       }
     } catch (err) {
       console.error("Upload error:", err);
-      setError("Failed to upload video");
+      const errorMsg =
+        err instanceof Error ? err.message : "Failed to upload video";
+      setError(errorMsg);
+      setUploadedFile(null);
     }
   };
 
@@ -200,6 +208,17 @@ export default function AgentChat() {
     setIsLoading(true);
     setError(null);
 
+    // Check if this is a clipping request
+    const isClippingRequest =
+      uploadedVideoPath &&
+      (input.toLowerCase().includes("clip") ||
+        input.toLowerCase().includes("cut") ||
+        input.toLowerCase().includes("trim"));
+
+    if (isClippingRequest) {
+      setIsClipping(true);
+    }
+
     try {
       const result = await askAgent(userMessage.content, uploadedVideoPath);
 
@@ -218,11 +237,12 @@ export default function AgentChat() {
       );
     } finally {
       setIsLoading(false);
+      setIsClipping(false);
     }
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="flex h-screen flex-col overflow-hidden bg-[#D3D1DE]">
       <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
         <ChatContainerContent className="space-y-12 px-4 py-12">
           {messages.length === 0 && (
@@ -254,7 +274,12 @@ export default function AgentChat() {
             );
           })}
 
-          {isLoading && <LoadingMessage />}
+          {isClipping && (
+            <div className="mx-auto w-full max-w-3xl px-2 md:px-10">
+              <ClippingAnimation />
+            </div>
+          )}
+          {isLoading && !isClipping && <LoadingMessage />}
           {error && <ErrorMessage error={error} />}
         </ChatContainerContent>
       </ChatContainerRoot>
