@@ -1,50 +1,28 @@
 {
-  "name": "adk-simple-agent",
-  "version": "0.0.1",
-  "description": "adk-simple-agent is a starter project for creating simple adk agent",
-  "main": "dist/index.js",
+  "name": "adk-with-next-js",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx src/index.ts",
-    "start": "node dist/index.js",
-    "chat": "tsx src/index.ts",
-    "advanced": "tsx src/interactive.ts",
-    "interactive": "tsx src/interactive.ts",
-    "clean": "rimraf dist",
-    "prebuild": "pnpm clean"
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "biome check",
+    "format": "biome format --write"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/IQAICOM/adk-agent-starter.git"
-  },
-  "keywords": [
-    "ai",
-    "agent",
-    "mcp",
-    "adk-ts",
-    "IQAI"
-  ],
-  "author": "IQAI",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/IQAICOM/adk-agent-starter/issues"
-  },
-  "homepage": "https://github.com/IQAICOM/adk-agent-starter#readme",
   "dependencies": {
-    "@clack/prompts": "^0.11.0",
-    "@iqai/adk": "^0.3.2",
-    "@types/node-fetch": "^2.6.13",
-    "dotenv": "^17.2.2",
-    "node-fetch": "^3.3.2",
-    "picocolors": "^1.1.1",
-    "puppeteer": "^24.22.3",
-    "zod": "^4.1.5"
+    "@iqai/adk": "^0.5.0",
+    "next": "15.5.5",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@types/node": "^24.3.1",
-    "rimraf": "^6.0.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "@biomejs/biome": "2.2.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }

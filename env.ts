@@ -14,7 +14,6 @@ export const envSchema = z.object({
   ADK_DEBUG: z.coerce.boolean().default(false),
   GOOGLE_API_KEY: z.string(),
   LLM_MODEL: z.string().default("gemini-2.5-flash"),
-  BRAVE_API_KEY: z.string(),
 });
 
 /**
