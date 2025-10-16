@@ -1,4 +1,4 @@
-import { createTool } from "@iqai/adk";
+import { createTool, type Agent } from "@iqai/adk";
 import { z } from "zod";
 import { ElevenLabsClient } from "elevenlabs";
 import path from "node:path";
@@ -13,19 +13,16 @@ export const voiceTool = createTool({
   description:
     "Generate viral voiceover script and audio for UGC avatars using ElevenLabs",
   schema: z.object({
+    script: z.string().describe("The script for the voiceover"),
     avatarType: z
       .string()
       .describe("Type of avatar: fitness, beauty, tech, lifestyle, etc"),
     tone: z
       .string()
       .describe("Voice tone: energetic, calm, professional, funny, dramatic"),
-    topic: z.string().describe("Topic or hook for the voiceover"),
-    duration: z.number().describe("Target duration in seconds (15-60)"),
   }),
-  fn: async ({ avatarType, tone, topic, duration }) => {
+  fn: async ({ script, avatarType, tone }) => {
     try {
-      const script = generateScript(avatarType, tone, topic, duration);
-
       const voiceId = selectVoiceId(tone, avatarType);
 
       const audio = await client.textToSpeech.convert(voiceId, {
@@ -61,23 +58,21 @@ export const voiceTool = createTool({
       await fs.writeFile(audioPath, Buffer.concat(chunks));
       await fs.writeFile(scriptPath, script);
 
-      return JSON.stringify({
+      return {
         success: true,
         script,
         scriptUrl: `/uploads/voiceovers/${scriptFilename}`,
         audioUrl: `/uploads/voiceovers/${audioFilename}`,
-        estimatedDuration: duration,
         voiceType: tone,
         avatarType,
-        suggestions: {
-          hooks: generateHooks(topic),
-          cta: generateCTA(avatarType),
-        },
-      });
+      };
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
-      return `Error generating voiceover: ${errorMessage}`;
+      return {
+        success: false,
+        error: `Error generating voiceover: ${errorMessage}`,
+      };
     }
   },
 });
@@ -92,38 +87,4 @@ function selectVoiceId(tone: string, avatarType: string): string {
   };
 
   return voices[tone.toLowerCase()] || voices.professional;
-}
-
-function generateScript(
-  avatarType: string,
-  tone: string,
-  topic: string,
-  duration: number,
-): string {
-  const hooks = generateHooks(topic);
-  const cta = generateCTA(avatarType);
-
-  return `${hooks[0]} ${topic} ${cta}`;
-}
-
-function generateHooks(topic: string): string[] {
-  return [
-    `Stop scrolling! You need to see this...`,
-    `Wait, this changes everything about ${topic}...`,
-    `Nobody talks about this...`,
-    `I can't believe this actually works...`,
-    `This is the secret everyone's asking about...`,
-  ];
-}
-
-function generateCTA(avatarType: string): string {
-  const ctas: Record<string, string> = {
-    fitness: "Follow for more fitness tips!",
-    beauty: "Follow for daily beauty hacks!",
-    tech: "More tech tips coming!",
-    lifestyle: "Follow for more life-changing content!",
-    default: "Follow for more!",
-  };
-
-  return ctas[avatarType.toLowerCase()] || ctas.default;
 }

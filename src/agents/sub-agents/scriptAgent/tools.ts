@@ -14,13 +14,13 @@ export const scriptIdeationTool = createTool({
     const hooks = generateViralHooks(niche, goalType);
     const structure = generateScriptStructure(goalType);
 
-    return JSON.stringify({
+    return {
       success: true,
       scriptIdeas: ideas,
       viralHooks: hooks,
       structure: structure,
       tips: getContentTips(avatarType, goalType),
-    });
+    };
   },
 });
 
