@@ -22,20 +22,17 @@ import {
   AlertTriangle,
   ArrowUp,
   Copy,
-  Paperclip,
   ThumbsDown,
   ThumbsUp,
-  X,
 } from "lucide-react";
-import { memo, useRef, useState } from "react";
+import { memo, useState } from "react";
 import { askAgent } from "../_actions";
-import { ClippingAnimation } from "@/components/clipping-animation";
 
 type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   content: string;
-  videoPath?: string;
+  audioUrl?: string;
 };
 
 type MessageComponentProps = {
@@ -62,10 +59,19 @@ const MessageComponent = memo(
             >
               {message.content}
             </MessageContent>
+            {message.audioUrl && (
+              <div className="mt-4 w-full">
+                <audio
+                  controls
+                  src={message.audioUrl}
+                  className="w-full rounded-lg border border-gray-200"
+                />
+              </div>
+            )}
             <MessageActions
               className={cn(
                 "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                isLastMessage && "opacity-100",
+                isLastMessage ? "opacity-100" : "",
               )}
             >
               <MessageAction tooltip="Copy" delayDuration={100}>
@@ -110,7 +116,7 @@ const MessageComponent = memo(
 
 const LoadingMessage = memo(() => (
   <Message className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
-    <div className="group flex w-full flex-col gap-0">
+    <div className="group flex w-full flex-col gap-2">
       <div className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0">
         <DotsLoader />
       </div>
@@ -134,73 +140,14 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [uploadedVideoPath, setUploadedVideoPath] = useState<string | null>(
-    null,
-  );
-  const [isClipping, setIsClipping] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("video/")) {
-      setError("Please upload a video file");
-      return;
-    }
-
-    setUploadedFile(file);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (data.success && data.path) {
-        setUploadedVideoPath(data.path);
-        console.log("Video uploaded successfully:", data);
-      } else {
-        const errorMsg = data.error || "Failed to upload video";
-        console.error(errorMsg, data);
-        setError(errorMsg);
-        setUploadedFile(null);
-      }
-    } catch (err) {
-      console.error("Upload error:", err);
-      const errorMsg =
-        err instanceof Error ? err.message : "Failed to upload video";
-      setError(errorMsg);
-      setUploadedFile(null);
-    }
-  };
-
-  const clearFile = () => {
-    setUploadedFile(null);
-    setUploadedVideoPath(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const handleSubmit = async () => {
-    if ((!input.trim() && !uploadedVideoPath) || isLoading) return;
-
-    const messageContent = uploadedFile
-      ? `${input.trim()}\n[Video uploaded: ${uploadedFile.name}]`
-      : input.trim();
+    if (!input.trim() || isLoading) return;
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
       role: "user",
-      content: messageContent,
-      videoPath: uploadedVideoPath || undefined,
+      content: input.trim(),
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -208,36 +155,43 @@ export default function ChatPage() {
     setIsLoading(true);
     setError(null);
 
-    // Check if this is a clipping request
-    const isClippingRequest =
-      uploadedVideoPath &&
-      (input.toLowerCase().includes("clip") ||
-        input.toLowerCase().includes("cut") ||
-        input.toLowerCase().includes("trim"));
-
-    if (isClippingRequest) {
-      setIsClipping(true);
-    }
-
     try {
-      const result = await askAgent(userMessage.content, uploadedVideoPath);
+      const result = await askAgent(userMessage.content, "default", "default");
+
+      let messageContent = "";
+      let audioUrl = undefined;
+
+      if ("error" in result && result.error) {
+        messageContent = `Error: ${result.error}`;
+      } else if ("audioUrl" in result) {
+        messageContent = result.script;
+        audioUrl = result.audioUrl;
+      } else {
+        messageContent = result.content;
+      }
 
       const assistantMessage: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
-        content: result,
+        content: messageContent,
+        audioUrl: audioUrl,
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
-      clearFile();
     } catch (err) {
       console.error("Error:", err);
-      setError(
-        err instanceof Error ? err.message : "Error processing your request.",
-      );
+      const errorMessage =
+        err instanceof Error ? err.message : "Error processing your request.";
+      setError(errorMessage);
+
+      const errorResponseMessage: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: `Error: ${errorMessage}`,
+      };
+      setMessages((prev) => [...prev, errorResponseMessage]);
     } finally {
       setIsLoading(false);
-      setIsClipping(false);
     }
   };
 
@@ -254,11 +208,9 @@ export default function ChatPage() {
                 Try asking:
               </div>
               <ul className="text-muted-foreground list-inside list-disc space-y-1">
-                <li>
-                  Upload a video and ask to clip it from 00:00:10 for 5 seconds
-                </li>
                 <li>Give me ideas for birthday video moments</li>
                 <li>What should I capture on my vacation?</li>
+                <li>Help me write a creative script</li>
               </ul>
             </div>
           )}
@@ -274,12 +226,7 @@ export default function ChatPage() {
             );
           })}
 
-          {isClipping && (
-            <div className="mx-auto w-full max-w-3xl px-2 md:px-10">
-              <ClippingAnimation />
-            </div>
-          )}
-          {isLoading && !isClipping && <LoadingMessage />}
+          {isLoading && <LoadingMessage />}
           {error && <ErrorMessage error={error} />}
         </ChatContainerContent>
       </ChatContainerRoot>
@@ -293,49 +240,15 @@ export default function ChatPage() {
           className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
         >
           <div className="flex flex-col">
-            {uploadedFile && (
-              <div className="mx-2 mt-2 flex items-center gap-2 rounded-lg bg-muted px-3 py-2">
-                <Paperclip size={16} />
-                <span className="flex-1 truncate text-sm">
-                  {uploadedFile.name}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-6"
-                  onClick={clearFile}
-                >
-                  <X size={14} />
-                </Button>
-              </div>
-            )}
             <PromptInputTextarea
-              placeholder="Ask your agent anything or upload a video to clip..."
+              placeholder="Ask your agent anything..."
               className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
             />
             <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 p-2">
-              <div>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="video/*"
-                  className="hidden"
-                  onChange={handleFileSelect}
-                />
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="rounded-full"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isLoading}
-                >
-                  <Paperclip size={18} />
-                </Button>
-              </div>
               <div className="flex items-center gap-2">
                 <Button
                   size="icon"
-                  disabled={(!input.trim() && !uploadedVideoPath) || isLoading}
+                  disabled={!input.trim() || isLoading}
                   onClick={handleSubmit}
                   className="size-9 rounded-full"
                 >

@@ -1,12 +1,10 @@
 import { createTool, type Agent } from "@iqai/adk";
 import { z } from "zod";
-import { ElevenLabsClient } from "elevenlabs";
 import path from "node:path";
 import fs from "node:fs/promises";
 
-const client = new ElevenLabsClient({
-  apiKey: process.env.ELEVENLABS_API_KEY,
-});
+const ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1";
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
 export const voiceTool = createTool({
   name: "generate_voiceover",
@@ -23,13 +21,41 @@ export const voiceTool = createTool({
   }),
   fn: async ({ script, avatarType, tone }) => {
     try {
-      const voiceId = selectVoiceId(tone, avatarType);
-
-      const audio = await client.textToSpeech.convert(voiceId, {
-        text: script,
-        model_id: "eleven_turbo_v2_5",
+      console.log("Generating voiceover with params:", {
+        script,
+        avatarType,
+        tone,
       });
+      const voiceId = selectVoiceId(tone, avatarType);
+      console.log("Selected voice ID:", voiceId);
 
+      const response = await fetch(
+        `${ELEVENLABS_BASE_URL}/text-to-speech/${voiceId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xi-api-key": ELEVENLABS_API_KEY || "",
+          },
+          body: JSON.stringify({
+            text: script,
+            model_id: "eleven_turbo_v2",
+            voice_settings: {
+              stability: 0.5,
+              similarity_boost: 0.75,
+            },
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        console.error("ElevenLabs API error:", response.statusText);
+        throw new Error(`ElevenLabs API error: ${response.statusText}`);
+      }
+
+      console.log("API response received, processing audio buffer...");
+      const audioBuffer = await response.arrayBuffer();
+      console.log("Audio buffer size:", audioBuffer.byteLength, "bytes");
       const timestamp = Date.now();
       const audioFilename = `voiceover_${timestamp}.mp3`;
       const scriptFilename = `script_${timestamp}.txt`;
@@ -51,12 +77,14 @@ export const voiceTool = createTool({
 
       await fs.mkdir(path.dirname(audioPath), { recursive: true });
 
-      const chunks: Buffer[] = [];
-      for await (const chunk of audio) {
-        chunks.push(chunk);
-      }
-      await fs.writeFile(audioPath, Buffer.concat(chunks));
+      await fs.writeFile(audioPath, Buffer.from(audioBuffer));
       await fs.writeFile(scriptPath, script);
+
+      console.log("Files written successfully:", {
+        audioPath,
+        scriptPath,
+        audioSize: audioBuffer.byteLength,
+      });
 
       return {
         success: true,
@@ -69,6 +97,7 @@ export const voiceTool = createTool({
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Unknown error";
+      console.error("Voice generation error:", errorMessage);
       return {
         success: false,
         error: `Error generating voiceover: ${errorMessage}`,

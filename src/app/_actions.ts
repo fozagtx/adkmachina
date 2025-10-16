@@ -1,55 +1,75 @@
 "use server";
 
 import { getRootAgent } from "@/agents";
-import { writeFile, mkdir } from "node:fs/promises";
-import path from "node:path";
 
-export async function uploadVideo(formData: FormData) {
-  try {
-    const file = formData.get("file") as File;
+export interface AgentResponse {
+  success: boolean;
+  content: string;
+  error?: string;
+}
 
-    if (!file) {
-      throw new Error("No file uploaded");
-    }
-
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
-    const filename = `${Date.now()}_${file.name}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "videos");
-
-    // Ensure the upload directory exists
-    await mkdir(uploadDir, { recursive: true });
-
-    const filepath = path.join(uploadDir, filename);
-
-    await writeFile(filepath, buffer);
-
-    return {
-      success: true,
-      filename,
-      path: filepath,
-      publicUrl: `/uploads/videos/${filename}`,
-    };
-  } catch (error) {
-    console.error("Upload error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to upload file";
-    throw new Error(errorMessage);
-  }
+export interface AudioAgentResponse extends AgentResponse {
+  script: string;
+  audioUrl: string;
+  voiceType: string;
+  avatarType: string;
 }
 
 export async function askAgent(
   message: string,
-  avatarType: string,
-  tone: string,
-) {
+  avatarType?: string,
+  tone?: string,
+): Promise<AgentResponse | AudioAgentResponse> {
   const { runner } = await getRootAgent();
 
-  const result = await runner.ask(message, {
-    avatarType,
-    tone,
-  });
+  try {
+    const formattedMessage =
+      tone && avatarType
+        ? `${message}\n\nConfig:\navatarType: ${avatarType}\ntone: ${tone}`
+        : message;
 
-  return result;
+    const result = await runner.ask(formattedMessage);
+
+    // Type guard to check if result is an audio response
+    const isAudioResponse = (
+      obj: any,
+    ): obj is {
+      success: boolean;
+      script: string;
+      audioUrl: string;
+      voiceType: string;
+      avatarType: string;
+    } => {
+      return (
+        typeof obj === "object" &&
+        obj !== null &&
+        typeof obj.script === "string" &&
+        typeof obj.audioUrl === "string" &&
+        typeof obj.voiceType === "string" &&
+        typeof obj.avatarType === "string"
+      );
+    };
+
+    if (isAudioResponse(result)) {
+      return {
+        success: true,
+        content: result.script,
+        script: result.script,
+        audioUrl: result.audioUrl,
+        voiceType: result.voiceType,
+        avatarType: result.avatarType,
+      };
+    }
+
+    return {
+      success: true,
+      content: String(result),
+    };
+  } catch (error) {
+    return {
+      success: false,
+      content: "",
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
+  }
 }
