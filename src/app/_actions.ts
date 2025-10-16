@@ -39,14 +39,17 @@ export async function uploadVideo(formData: FormData) {
   }
 }
 
-export async function askAgent(message: string, videoPath?: string | null) {
+export async function askAgent(
+  message: string,
+  avatarType: string,
+  tone: string,
+) {
   const { runner } = await getRootAgent();
 
-  let fullMessage = message;
-  if (videoPath) {
-    fullMessage = `${message}\n\nUploaded video path: ${videoPath}`;
-  }
+  const result = await runner.ask(message, {
+    avatarType,
+    tone,
+  });
 
-  const result = await runner.ask(fullMessage);
   return result;
 }
