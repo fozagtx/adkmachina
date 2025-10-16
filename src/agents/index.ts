@@ -1,20 +1,20 @@
 import { env } from "node:process";
 import { AgentBuilder } from "@iqai/adk";
-import { getMemoryAgent } from "./sub-agents/memoryAgent/agent";
-import { getClipperAgent } from "./sub-agents/clipperAgent/agent";
+import { getVoiceAgent } from "./sub-agents/voiceAgent/agent";
+import { getScriptAgent } from "./sub-agents/scriptAgent/agent";
 
 export const getRootAgent = () => {
-  const memoryAgent = getMemoryAgent();
-  const clipperAgent = getClipperAgent();
+  const voiceAgent = getVoiceAgent();
+  const scriptAgent = getScriptAgent();
 
   return AgentBuilder.create("root_agent")
     .withDescription(
-      "Root agent that helps create video memories by generating ideas and clipping videos.",
+      "Root agent that helps create viral UGC content with script ideation and voiceovers for avatars.",
     )
     .withInstruction(
-      "Use the memory agent for brainstorming filming ideas and the clipper agent for video processing. For clipping, accept natural time formats like 'clip from 5 seconds for 10 seconds' or 'clip at 1:30 for 20s'. Convert user's natural language to the format needed.",
+      "Use the script agent for generating viral script ideas, hooks, and content structure. Use the voice agent for generating voiceover audio with different tones. Support different avatar types (fitness, beauty, tech, lifestyle) and help users create engaging 15-60 second viral content.",
     )
     .withModel(env.LLM_MODEL || "gemini-2.0-flash-exp")
-    .withSubAgents([memoryAgent, clipperAgent])
+    .withSubAgents([scriptAgent, voiceAgent])
     .build();
 };
