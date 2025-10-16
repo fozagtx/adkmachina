@@ -18,7 +18,7 @@ export const memoryTool = createTool({
       ),
   }),
   fn: async ({ occasion }) => {
-    const ideas = {
+    const ideas: Record<string, string> = {
       vacation:
         "Arrival reactions, Golden hour shots, Local food experiences, Candid interactions",
       birthday:
@@ -27,7 +27,6 @@ export const memoryTool = createTool({
       "daily life":
         "Morning routine, Pet moments, Meal prep, Evening wind-down",
     };
-
     return (
       ideas[occasion.toLowerCase()] ||
       "Opening shot, Genuine reactions, Detail shots, Ambient sounds"
