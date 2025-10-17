@@ -1,123 +1,181 @@
+import { Mic, Sparkles, Video, Zap } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Video, Mic, Zap } from "lucide-react";
+
+const features = [
+  {
+    icon: Video,
+    title: "Script Generation",
+    description:
+      "Generate compelling product scripts tailored to your brand voice and target audience.",
+    accent: "from-purple-500/30 via-purple-500/10 to-transparent",
+    iconBg: "bg-purple-500/20 text-purple-100",
+  },
+  {
+    icon: Mic,
+    title: "Voice Synthesis",
+    description:
+      "Convert scripts into natural-sounding voiceovers with customizable tones and styles.",
+    accent: "from-pink-500/30 via-pink-400/10 to-transparent",
+    iconBg: "bg-pink-500/20 text-pink-100",
+  },
+  {
+    icon: Zap,
+    title: "Instant Export",
+    description:
+      "Download your scripts and audio files instantly, ready for your video production.",
+    accent: "from-blue-500/30 via-blue-400/10 to-transparent",
+    iconBg: "bg-blue-500/20 text-blue-100",
+  },
+];
+
+const stats = [
+  { label: "Campaigns accelerated", value: "5x" },
+  { label: "Ready-to-use scripts", value: "1K+" },
+  { label: "Voice styles available", value: "40+" },
+];
 
 export default function LandingPage() {
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 text-white min-h-screen flex flex-col">
-      <header className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 flex justify-between items-center">
-        <div className="text-2xl font-bold flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-            <Sparkles className="size-8 text-purple-500" />
-            <span>UGC Studio</span>
-          </Link>
-        </div>
-        <nav>
-          <Link href="/workflow">
-            <Button variant="ghost" className="hover:text-purple-400">
-              Get Started
-            </Button>
-          </Link>
-        </nav>
-      </header>
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+      <div
+        className="absolute inset-0 bg-gradient-to-br from-[#0b0b1f] via-[#0f172a] to-[#05050d]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute -top-40 left-1/2 h-[28rem] w-[28rem] -translate-x-1/2 rounded-full bg-purple-600/40 blur-3xl md:h-[36rem] md:w-[36rem]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-x-0 bottom-[-14rem] h-[30rem] bg-[radial-gradient(circle_at_bottom,rgba(168,85,247,0.28),transparent_65%)]"
+        aria-hidden="true"
+      />
 
-      <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center w-full">
-          <div className="space-y-8 text-center lg:text-left">
-            <div className="inline-block">
-              <span className="px-4 py-2 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium border border-purple-500/30">
+      <div className="relative z-10 flex min-h-screen flex-col">
+        <header className="container mx-auto flex flex-wrap items-center justify-between gap-4 px-4 py-6 sm:px-6 lg:px-12">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-2xl font-semibold"
+          >
+            <span className="flex size-10 items-center justify-center rounded-full bg-white/10">
+              <Sparkles className="size-6 text-purple-300" />
+            </span>
+            <span className="tracking-tight">UGC Studio</span>
+          </Link>
+          <nav>
+            <Link href="/workflow">
+              <Button
+                variant="ghost"
+                size="lg"
+                className="text-slate-100 hover:text-white"
+              >
+                Get Started
+              </Button>
+            </Link>
+          </nav>
+        </header>
+
+        <main className="container mx-auto flex-1 px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:px-12">
+          <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:gap-16">
+            <div className="space-y-10 text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-slate-100 shadow-lg shadow-purple-500/20">
                 ✨ AI-Powered Content Creation
-              </span>
+              </div>
+              <div className="space-y-6">
+                <h1 className="text-balance text-4xl font-bold leading-tight sm:text-5xl md:text-6xl xl:text-7xl">
+                  Create Authentic
+                  <span className="block bg-gradient-to-r from-purple-300 via-pink-300 to-purple-400 bg-clip-text text-transparent drop-shadow-[0_10px_40px_rgba(168,85,247,0.35)]">
+                    UGC Content
+                  </span>
+                  <span className="block">For Your Products</span>
+                </h1>
+                <p className="mx-auto max-w-2xl text-base text-slate-200 sm:text-lg md:text-xl">
+                  Transform your product marketing with AI-generated scripts and
+                  professional voiceovers. Produce stunning UGC videos in
+                  minutes instead of hours.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
+                <Link href="/workflow">
+                  <Button
+                    size="lg"
+                    variant="premium"
+                    className="w-full rounded-full px-8 font-semibold shadow-lg shadow-purple-500/30 transition-transform hover:-translate-y-0.5 sm:w-auto"
+                  >
+                    Start Creating Free
+                  </Button>
+                </Link>
+                <Link href="/workflow">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full rounded-full border-white/30 bg-white/10 px-8 text-white transition hover:bg-white/20 hover:text-white sm:w-auto"
+                  >
+                    See How It Works
+                  </Button>
+                </Link>
+              </div>
+              <p className="text-sm text-slate-300">
+                No credit card required · Generate unlimited scripts
+              </p>
+              <div className="mx-auto grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-3 lg:mx-0">
+                {stats.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left backdrop-blur"
+                  >
+                    <p className="text-3xl font-semibold text-white sm:text-4xl">
+                      {stat.value}
+                    </p>
+                    <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-300">
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
-              Create Authentic
-              <span className="block bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 text-transparent bg-clip-text">
-                UGC Content
-              </span>
-              <span className="block">For Your Products</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 leading-relaxed max-w-2xl mx-auto lg:mx-0">
-              Transform your product marketing with AI-generated scripts and
-              professional voiceovers. Create engaging UGC videos in minutes,
-              not hours.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-              <Link href="/workflow">
-                <Button
-                  variant="premium"
-                  className="w-full sm:w-auto rounded-full text-lg py-6 px-10 hover:scale-105 transition-transform"
-                >
-                  Start Creating Free
-                </Button>
-              </Link>
-              <Link href="/workflow">
-                <Button
-                  variant="outline"
-                  className="w-full sm:w-auto rounded-full text-lg py-6 px-10 bg-white/10 border-white/20 hover:bg-white/20"
-                >
-                  See How It Works
-                </Button>
-              </Link>
+
+            <div className="relative mx-auto w-full max-w-md space-y-5 sm:max-w-lg">
+              {features.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <div
+                    key={feature.title}
+                    className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6 shadow-2xl backdrop-blur"
+                  >
+                    <div
+                      className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${feature.accent} opacity-60`}
+                      aria-hidden="true"
+                    />
+                    <div className="relative flex items-start gap-4">
+                      <span
+                        className={`flex size-12 items-center justify-center rounded-2xl ${feature.iconBg}`}
+                      >
+                        <Icon className="size-6" />
+                      </span>
+                      <div className="space-y-2">
+                        <h3 className="text-lg font-semibold text-white">
+                          {feature.title}
+                        </h3>
+                        <p className="text-sm text-slate-200">
+                          {feature.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <p className="text-sm text-gray-400">
-              No credit card required • Generate unlimited scripts
-            </p>
           </div>
-          
-          <div className="flex justify-center lg:justify-end">
-            <div className="grid grid-cols-1 gap-6 max-w-md w-full">
-              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl p-6 backdrop-blur-sm">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-purple-500/20 rounded-xl">
-                    <Video className="size-6 text-purple-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Script Generation</h3>
-                    <p className="text-sm text-gray-400">AI-powered hooks & CTAs</p>
-                  </div>
-                </div>
-                <p className="text-gray-300 text-sm">
-                  Generate compelling product scripts tailored to your brand voice and target audience.
-                </p>
-              </div>
+        </main>
 
-              <div className="bg-gradient-to-br from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-2xl p-6 backdrop-blur-sm">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-pink-500/20 rounded-xl">
-                    <Mic className="size-6 text-pink-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Voice Synthesis</h3>
-                    <p className="text-sm text-gray-400">Professional quality audio</p>
-                  </div>
-                </div>
-                <p className="text-gray-300 text-sm">
-                  Convert scripts into natural-sounding voiceovers with customizable tones and styles.
-                </p>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-blue-500/20 rounded-2xl p-6 backdrop-blur-sm">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="p-3 bg-blue-500/20 rounded-xl">
-                    <Zap className="size-6 text-blue-400" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">Instant Export</h3>
-                    <p className="text-sm text-gray-400">Ready to use content</p>
-                  </div>
-                </div>
-                <p className="text-gray-300 text-sm">
-                  Download your scripts and audio files instantly, ready for your video production.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <footer className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-gray-400 text-sm">
-        <p>Trusted by product marketers and content creators worldwide</p>
-      </footer>
+        <footer className="container mx-auto px-4 pb-12 text-center text-sm text-slate-300 sm:px-6 lg:px-12">
+          <p className="mx-auto max-w-2xl">
+            Trusted by product marketers, creators, and growth teams who need
+            high-performing UGC content on demand.
+          </p>
+        </footer>
+      </div>
     </div>
   );
 }

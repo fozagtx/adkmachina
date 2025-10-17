@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Volume2 } from "lucide-react";
 import { Handle, Position } from "@xyflow/react";
+import { Volume2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface AudioOutputNodeProps {
   data: {
@@ -11,41 +11,40 @@ interface AudioOutputNodeProps {
 }
 
 export const AudioOutputNode = ({ data }: AudioOutputNodeProps) => {
-  console.log("Audio output node rendered with URL:", data.audioUrl);
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-[320px] border-2 border-gray-200">
+    <div className="w-full max-w-[340px] rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-xl sm:p-6">
       <Handle
         type="target"
         position={Position.Left}
-        style={{ background: "#555" }}
+        id="audio-input"
+        style={{ background: "#6366f1" }}
       />
-      <div className="flex items-center gap-2 mb-4 drag-handle cursor-move">
-        <Volume2 className="h-5 w-5" />
+      <div className="mb-4 flex items-center gap-2 drag-handle cursor-move">
+        <Volume2 className="h-5 w-5 text-indigo-600" />
         <div>
-          <h3 className="font-semibold text-lg">Audio Output</h3>
+          <h3 className="text-lg font-semibold">Audio Output</h3>
           <p className="text-xs text-gray-500">Generated voice-over playback</p>
         </div>
       </div>
 
       {data.audioUrl ? (
         <div className="space-y-4">
-          <audio
-            controls
-            className="w-full"
-            onError={(e) => {
-              console.error("Audio playback error:", e);
-              e.currentTarget.classList.add("error");
-            }}
-            onLoadStart={() => console.log("Audio loading started")}
-            onCanPlay={() => console.log("Audio can play now")}
-          >
-            <source
-              src={data.audioUrl || ""}
-              type="audio/mpeg"
-              onError={(e) => console.error("Source error:", e)}
-            />
-            Your browser does not support the audio element.
-          </audio>
+          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+            <audio
+              controls
+              className="w-full"
+              onError={(e) => {
+                console.error("Audio playback error:", e);
+              }}
+            >
+              <source
+                src={data.audioUrl || ""}
+                type="audio/mpeg"
+                onError={(e) => console.error("Source error:", e)}
+              />
+              Your browser does not support the audio element.
+            </audio>
+          </div>
           <Button
             onClick={() => {
               try {
@@ -56,25 +55,24 @@ export const AudioOutputNode = ({ data }: AudioOutputNodeProps) => {
                 }
                 a.href = data.audioUrl;
                 a.download = `voiceover_${Date.now()}.mp3`;
-                console.log("Initiating download:", a.href);
                 a.click();
               } catch (error) {
                 console.error("Download error:", error);
               }
             }}
-            className="w-full text-xs h-8"
+            className="h-9 w-full rounded-lg bg-indigo-600 text-xs font-semibold text-white transition hover:bg-indigo-700"
             disabled={!data.audioUrl}
           >
             Download Audio
           </Button>
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-8 sm:py-12 text-gray-400">
-          <Volume2 className="h-12 w-12 mb-3" />
+        <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 py-8 text-gray-400 sm:py-12">
+          <Volume2 className="mb-3 h-12 w-12" />
           <p className="text-base font-medium text-gray-600">
             No audio generated yet
           </p>
-          <p className="text-xs text-gray-500 mt-1 text-center">
+          <p className="mt-1 text-center text-xs text-gray-500">
             Paste the script text and generate voice-over
           </p>
         </div>

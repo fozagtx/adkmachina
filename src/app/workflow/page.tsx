@@ -1,32 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import {
-  ReactFlow,
-  Controls,
-  Background,
-  useNodesState,
-  useEdgesState,
   addEdge,
+  Background,
   type Connection,
-  type Node,
+  Controls,
   type Edge,
-  type NodeTypes,
   MarkerType,
+  type Node,
+  type NodeTypes,
+  ReactFlow,
+  useEdgesState,
+  useNodesState,
 } from "@xyflow/react";
+import { useCallback, useEffect, useState } from "react";
 import "@xyflow/react/dist/style.css";
-import { AlertTriangle } from "lucide-react";
-import { CopyButton } from "@/components/prompt-kit/copy-button";
-import {
-  Message as PromptMessage,
-  MessageAction,
-  MessageActions,
-  MessageContent,
-} from "@/components/prompt-kit/message";
+import { AlertTriangle, ArrowUp } from "lucide-react";
 import {
   ChatContainerContent,
   ChatContainerRoot,
 } from "@/components/prompt-kit/chat-container";
+import { CopyButton } from "@/components/prompt-kit/copy-button";
+import {
+  MessageAction,
+  MessageActions,
+  MessageContent,
+  Message as PromptMessage,
+} from "@/components/prompt-kit/message";
 import {
   PromptInput,
   PromptInputActions,
@@ -34,12 +34,10 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { ArrowUp } from "lucide-react";
-
-import { ScriptInputNode } from "./components/script-input-node";
-import { AudioOutputNode } from "./components/audio-output-node";
-import { VoiceCustomizationNode } from "./components/voice-customization-node";
 import { askAgent } from "../_actions";
+import { AudioOutputNode } from "./components/audio-output-node";
+import { ScriptInputNode } from "./components/script-input-node";
+import { VoiceCustomizationNode } from "./components/voice-customization-node";
 
 const nodeTypes: NodeTypes = {
   scriptInput: ScriptInputNode,
@@ -76,7 +74,7 @@ const initialNodes: CustomNode[] = [
       isGenerating: false,
     },
     dragHandle: ".drag-handle",
-    style: { width: 320 },
+    style: { width: "clamp(240px, 32vw, 340px)" },
   },
   {
     id: "3",
@@ -87,7 +85,7 @@ const initialNodes: CustomNode[] = [
       onToneSelect: () => {},
     },
     dragHandle: ".drag-handle",
-    style: { width: 300 },
+    style: { width: "clamp(220px, 28vw, 320px)" },
   },
   {
     id: "2",
@@ -97,7 +95,7 @@ const initialNodes: CustomNode[] = [
       audioUrl: undefined,
     },
     dragHandle: ".drag-handle",
-    style: { width: 320 },
+    style: { width: "clamp(240px, 32vw, 340px)" },
   },
 ];
 
@@ -166,15 +164,17 @@ export default function WorkflowPage() {
     try {
       const response = await askAgent(input, "default", tone);
       const assistantMessage = {
-        id: String(Date.now()),
+        id: String(Date.now() + 1),
         role: "assistant",
         content: response.content,
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
-      if ("audioUrl" in response) {
+      if ("audioUrl" in response && response.audioUrl) {
         setScript(response.script);
         setAudioUrl(response.audioUrl);
+      } else if ("script" in response && response.script) {
+        setScript(response.script);
       }
       setStatus("ready");
     } catch (err) {
@@ -214,17 +214,36 @@ export default function WorkflowPage() {
                   console.error("Failed to paste:", error);
                 }
               },
-              onClear: () => setScript(""),
+              onClear: () => {
+                setScript("");
+                setAudioUrl(undefined);
+              },
               onGenerate: async () => {
-                if (!script) return;
+                if (!script.trim()) return;
                 setIsGenerating(true);
                 try {
-                  const response = await askAgent(script, "default", tone);
+                  const response = await askAgent(
+                    `Generate voiceover for this script: ${script}`,
+                    "default",
+                    tone,
+                  );
                   if ("audioUrl" in response && response.audioUrl) {
                     setAudioUrl(response.audioUrl);
+                    const successMsg = {
+                      id: String(Date.now()),
+                      role: "assistant",
+                      content: `Voice-over generated successfully with ${tone} tone!`,
+                    };
+                    setMessages((prev) => [...prev, successMsg]);
                   }
                 } catch (error) {
                   console.error("Error generating audio:", error);
+                  const errorMsg = {
+                    id: String(Date.now()),
+                    role: "assistant",
+                    content: "Failed to generate voice-over. Please try again.",
+                  };
+                  setMessages((prev) => [...prev, errorMsg]);
                 } finally {
                   setIsGenerating(false);
                 }
@@ -248,7 +267,15 @@ export default function WorkflowPage() {
             data: {
               ...node.data,
               selectedTone: tone,
-              onToneSelect: setTone,
+              onToneSelect: (newTone: string) => {
+                setTone(newTone);
+                const toneMsg = {
+                  id: String(Date.now()),
+                  role: "assistant",
+                  content: `Voice tone changed to ${newTone}. Generate voice-over to apply this tone.`,
+                };
+                setMessages((prev) => [...prev, toneMsg]);
+              },
             },
           };
         }
@@ -262,10 +289,18 @@ export default function WorkflowPage() {
   }, [updateNodes]);
 
   return (
-    <div className="h-screen flex flex-col md:flex-row bg-[#D3D1DE]">
-      <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200 bg-white flex flex-col">
+    <div className="h-screen flex flex-col lg:flex-row bg-[#D3D1DE]">
+      <div className="w-full lg:w-96 border-b lg:border-b-0 lg:border-r border-gray-200 bg-white flex flex-col max-h-[40vh] lg:max-h-screen">
         <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
           <ChatContainerContent className="space-y-12 px-4 py-12">
+            {messages.length === 0 && (
+              <div className="text-center text-gray-500 py-8">
+                <p className="text-sm">
+                  Ask the AI to generate scripts or voice-overs, or use the
+                  workflow nodes to create content.
+                </p>
+              </div>
+            )}
             {messages.map((message, index) => {
               const isLastMessage = index === messages.length - 1;
               const isAssistant = message.role === "assistant";
@@ -392,7 +427,7 @@ export default function WorkflowPage() {
         </div>
       </div>
 
-      <div className="flex-1 h-[50vh] md:h-auto">
+      <div className="flex-1 h-[60vh] lg:h-auto">
         <ReactFlow
           className="touch-none"
           nodes={nodes}
@@ -406,12 +441,15 @@ export default function WorkflowPage() {
           fitView
           fitViewOptions={{
             padding: 0.5,
-            minZoom: 0.5,
+            minZoom: 0.3,
             maxZoom: 1.5,
           }}
-          minZoom={0.5}
-          maxZoom={1.5}
-          defaultViewport={{ x: 0, y: 0, zoom: 1 }}
+          minZoom={0.3}
+          maxZoom={2}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+          nodesDraggable={true}
+          nodesConnectable={true}
+          elementsSelectable={true}
         >
           <Controls />
           <Background gap={12} size={1} />
