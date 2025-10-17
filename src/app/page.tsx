@@ -29,12 +29,6 @@ const features = [
   },
 ];
 
-const stats = [
-  { label: "Campaigns accelerated", value: "5x" },
-  { label: "Ready-to-use scripts", value: "1K+" },
-  { label: "Voice styles available", value: "40+" },
-];
-
 export default function LandingPage() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
@@ -79,7 +73,7 @@ export default function LandingPage() {
           <div className="grid items-center gap-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:gap-16">
             <div className="space-y-10 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-slate-100 shadow-lg shadow-purple-500/20">
-                ✨ AI-Powered Content Creation
+                ✨ Powered by ADK/T
               </div>
               <div className="space-y-6">
                 <h1 className="text-balance text-4xl font-bold leading-tight sm:text-5xl md:text-6xl xl:text-7xl">
@@ -94,44 +88,6 @@ export default function LandingPage() {
                   professional voiceovers. Produce stunning UGC videos in
                   minutes instead of hours.
                 </p>
-              </div>
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-                <Link href="/workflow">
-                  <Button
-                    size="lg"
-                    variant="premium"
-                    className="w-full rounded-full px-8 font-semibold shadow-lg shadow-purple-500/30 transition-transform hover:-translate-y-0.5 sm:w-auto"
-                  >
-                    Start Creating Free
-                  </Button>
-                </Link>
-                <Link href="/workflow">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full rounded-full border-white/30 bg-white/10 px-8 text-white transition hover:bg-white/20 hover:text-white sm:w-auto"
-                  >
-                    See How It Works
-                  </Button>
-                </Link>
-              </div>
-              <p className="text-sm text-slate-300">
-                No credit card required · Generate unlimited scripts
-              </p>
-              <div className="mx-auto grid w-full max-w-lg grid-cols-1 gap-4 sm:grid-cols-3 lg:mx-0">
-                {stats.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="rounded-2xl border border-white/10 bg-white/5 px-5 py-4 text-left backdrop-blur"
-                  >
-                    <p className="text-3xl font-semibold text-white sm:text-4xl">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-300">
-                      {stat.label}
-                    </p>
-                  </div>
-                ))}
               </div>
             </div>
 
