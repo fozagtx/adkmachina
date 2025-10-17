@@ -15,7 +15,8 @@ import {
   MarkerType,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, Sparkles } from "lucide-react";
 import { CopyButton } from "@/components/prompt-kit/copy-button";
 import {
   Message as PromptMessage,
@@ -76,28 +77,28 @@ const initialNodes: CustomNode[] = [
       isGenerating: false,
     },
     dragHandle: ".drag-handle",
-    style: { width: 320 },
+    style: { width: 360 },
   },
   {
     id: "3",
     type: "voiceCustomization",
-    position: { x: 450, y: 150 },
+    position: { x: 470, y: 150 },
     data: {
       selectedTone: "professional",
       onToneSelect: () => {},
     },
     dragHandle: ".drag-handle",
-    style: { width: 300 },
+    style: { width: 360 },
   },
   {
     id: "2",
     type: "audioOutput",
-    position: { x: 850, y: 150 },
+    position: { x: 890, y: 150 },
     data: {
       audioUrl: undefined,
     },
     dragHandle: ".drag-handle",
-    style: { width: 320 },
+    style: { width: 360 },
   },
 ];
 
@@ -109,13 +110,13 @@ const initialEdges: Edge[] = [
     type: "smoothstep",
     animated: true,
     style: {
-      stroke: "#6366f1",
+      stroke: "#a855f7",
       strokeWidth: 3,
       strokeDasharray: "5 5",
     },
     markerEnd: {
       type: MarkerType.Arrow,
-      color: "#6366f1",
+      color: "#a855f7",
     },
   },
   {
@@ -125,13 +126,13 @@ const initialEdges: Edge[] = [
     type: "smoothstep",
     animated: true,
     style: {
-      stroke: "#6366f1",
+      stroke: "#ec4899",
       strokeWidth: 3,
       strokeDasharray: "5 5",
     },
     markerEnd: {
       type: MarkerType.Arrow,
-      color: "#6366f1",
+      color: "#ec4899",
     },
   },
 ];
@@ -262,10 +263,28 @@ export default function WorkflowPage() {
   }, [updateNodes]);
 
   return (
-    <div className="h-screen flex flex-col md:flex-row bg-[#D3D1DE]">
-      <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-gray-200 bg-white flex flex-col">
-        <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
-          <ChatContainerContent className="space-y-12 px-4 py-12">
+    <div className="h-screen flex flex-col md:flex-row bg-gradient-to-br from-gray-900 via-purple-900/30 to-gray-900">
+      <div className="w-full md:w-96 border-b md:border-b-0 md:border-r border-purple-500/20 bg-gradient-to-b from-gray-900/95 to-gray-900 backdrop-blur-xl flex flex-col">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-5">
+          <div>
+            <div className="flex items-center gap-2 text-xs uppercase tracking-[0.45em] text-purple-200/70">
+              <Sparkles className="h-4 w-4" />
+              UGC Studio
+            </div>
+            <h2 className="mt-2 text-xl font-semibold text-white">Creator Console</h2>
+            <p className="text-xs text-purple-100/60">
+              Orchestrate scripts, voice, and delivery in one flow.
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs text-purple-100/70 transition hover:border-white/30 hover:bg-white/15"
+          >
+            Back to site
+          </Link>
+        </div>
+        <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto text-white">
+          <ChatContainerContent className="space-y-12 px-4 py-12 text-white/90">
             {messages.map((message, index) => {
               const isLastMessage = index === messages.length - 1;
               const isAssistant = message.role === "assistant";
@@ -280,7 +299,7 @@ export default function WorkflowPage() {
                   {isAssistant ? (
                     <div className="group flex w-full flex-col gap-0">
                       <MessageContent
-                        className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
+                        className="prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0 text-white/90 [&>*]:text-white/90"
                         markdown={true}
                       >
                         {message.content || ""}
@@ -305,7 +324,7 @@ export default function WorkflowPage() {
                     </div>
                   ) : (
                     <div className="group flex w-full flex-col items-end gap-1">
-                      <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 whitespace-pre-wrap sm:max-w-[75%]">
+                      <MessageContent className="max-w-[85%] rounded-3xl px-5 py-2.5 whitespace-pre-wrap sm:max-w-[75%] border border-white/15 bg-white/10 text-white shadow-[0_12px_30px_-15px_rgba(236,72,153,0.7)] backdrop-blur">
                         {message.content}
                       </MessageContent>
                       <MessageActions
@@ -332,11 +351,11 @@ export default function WorkflowPage() {
             {status === "submitted" && (
               <PromptMessage className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
                 <div className="group flex w-full flex-col gap-0">
-                  <div className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0">
+                  <div className="prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0">
                     <div className="flex space-x-2">
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
+                      <div className="h-2 w-2 rounded-full bg-purple-400 animate-bounce [animation-delay:-0.3s]"></div>
+                      <div className="h-2 w-2 rounded-full bg-pink-400 animate-bounce [animation-delay:-0.15s]"></div>
+                      <div className="h-2 w-2 rounded-full bg-purple-400 animate-bounce"></div>
                     </div>
                   </div>
                 </div>
@@ -360,18 +379,21 @@ export default function WorkflowPage() {
             value={input}
             onValueChange={setInput}
             onSubmit={handleSubmit}
-            className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+            className="relative z-10 w-full rounded-3xl border border-white/15 bg-white/10 p-0 pt-1 backdrop-blur-xl shadow-[0_18px_45px_-20px_rgba(168,85,247,0.6)]"
           >
             <div className="flex flex-col">
               <PromptInputTextarea
-                placeholder="Ask the AI agent..."
-                className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
+                placeholder="Ask the UGC studio to generate something magical..."
+                className="min-h-[44px] bg-transparent pt-3 pl-4 text-base leading-[1.3] text-white placeholder:text-purple-100/60 sm:text-base md:text-base"
               />
               <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 p-2">
-                <div />
+                <div className="text-xs text-purple-100/60">
+                  Enter to send • Shift + Enter for new line
+                </div>
                 <div className="flex items-center gap-2">
                   <Button
                     size="icon"
+                    variant="premium"
                     disabled={
                       !input.trim() ||
                       (status !== "ready" && status !== "error")
@@ -382,7 +404,7 @@ export default function WorkflowPage() {
                     {status === "ready" || status === "error" ? (
                       <ArrowUp size={18} />
                     ) : (
-                      <span className="size-3 rounded-xs bg-white" />
+                      <span className="h-3 w-3 rounded-full bg-white" />
                     )}
                   </Button>
                 </div>
