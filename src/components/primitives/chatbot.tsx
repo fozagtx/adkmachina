@@ -1,47 +1,47 @@
-"use client"
+"use client";
 
 import {
   ChatContainerContent,
   ChatContainerRoot,
-} from "@/components/prompt-kit/chat-container"
-import { DotsLoader } from "@/components/prompt-kit/loader"
+} from "@/components/prompt-kit/chat-container";
+import { DotsLoader } from "@/components/prompt-kit/loader";
 import {
   Message,
   MessageAction,
   MessageActions,
   MessageContent,
-} from "@/components/prompt-kit/message"
+} from "@/components/prompt-kit/message";
 import {
   PromptInput,
   PromptInputActions,
   PromptInputTextarea,
-} from "@/components/prompt-kit/prompt-input"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
-import { useChat, type UIMessage } from "@ai-sdk/react"
+} from "@/components/prompt-kit/prompt-input";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useChat, type UIMessage } from "@ai-sdk/react";
 import {
   AlertTriangle,
   ArrowUp,
   Copy,
   ThumbsDown,
   ThumbsUp,
-} from "lucide-react"
-import { memo, useState } from "react"
+} from "lucide-react";
+import { memo, useState } from "react";
 
 type MessageComponentProps = {
-  message: UIMessage
-  isLastMessage: boolean
-}
+  message: UIMessage;
+  isLastMessage: boolean;
+};
 
 export const MessageComponent = memo(
   ({ message, isLastMessage }: MessageComponentProps) => {
-    const isAssistant = message.role === "assistant"
+    const isAssistant = message.role === "assistant";
 
     return (
       <Message
         className={cn(
           "mx-auto flex w-full max-w-3xl flex-col gap-2 px-2 md:px-10",
-          isAssistant ? "items-start" : "items-end"
+          isAssistant ? "items-start" : "items-end",
         )}
       >
         {isAssistant ? (
@@ -51,13 +51,15 @@ export const MessageComponent = memo(
               markdown
             >
               {message.parts
-                .map((part) => (part.type === "text" ? part.text : null))
+                .map((part: UIMessage["parts"][number]) =>
+                  part.type === "text" ? part.text : null,
+                )
                 .join("")}
             </MessageContent>
             <MessageActions
               className={cn(
                 "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                isLastMessage && "opacity-100"
+                isLastMessage && "opacity-100",
               )}
             >
               <MessageAction tooltip="Copy" delayDuration={100}>
@@ -81,12 +83,14 @@ export const MessageComponent = memo(
           <div className="group flex w-full flex-col items-end gap-1">
             <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 whitespace-pre-wrap sm:max-w-[75%]">
               {message.parts
-                .map((part) => (part.type === "text" ? part.text : null))
+                .map((part: UIMessage["parts"][number]) =>
+                  part.type === "text" ? part.text : null,
+                )
                 .join("")}
             </MessageContent>
             <MessageActions
               className={cn(
-                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+                "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
               )}
             >
               <MessageAction tooltip="Copy" delayDuration={100}>
@@ -98,11 +102,11 @@ export const MessageComponent = memo(
           </div>
         )}
       </Message>
-    )
-  }
-)
+    );
+  },
+);
 
-MessageComponent.displayName = "MessageComponent"
+MessageComponent.displayName = "MessageComponent";
 
 const LoadingMessage = memo(() => (
   <Message className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
@@ -112,9 +116,9 @@ const LoadingMessage = memo(() => (
       </div>
     </div>
   </Message>
-))
+));
 
-LoadingMessage.displayName = "LoadingMessage"
+LoadingMessage.displayName = "LoadingMessage";
 
 const ErrorMessage = memo(({ error }: { error: Error }) => (
   <Message className="not-prose mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
@@ -125,28 +129,28 @@ const ErrorMessage = memo(({ error }: { error: Error }) => (
       </div>
     </div>
   </Message>
-))
+));
 
-ErrorMessage.displayName = "ErrorMessage"
+ErrorMessage.displayName = "ErrorMessage";
 
 function ConversationPromptInput() {
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
 
-  const { messages, sendMessage, status, error } = useChat()
+  const { messages, sendMessage, status, error } = useChat();
 
   const handleSubmit = () => {
-    if (!input.trim()) return
+    if (!input.trim()) return;
 
-    sendMessage({ text: input })
-    setInput("")
-  }
+    sendMessage({ text: input });
+    setInput("");
+  };
 
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
         <ChatContainerContent className="space-y-12 px-4 py-12">
-          {messages.map((message, index) => {
-            const isLastMessage = index === messages.length - 1
+          {messages.map((message: UIMessage, index: number) => {
+            const isLastMessage = index === messages.length - 1;
 
             return (
               <MessageComponent
@@ -154,7 +158,7 @@ function ConversationPromptInput() {
                 message={message}
                 isLastMessage={isLastMessage}
               />
-            )
+            );
           })}
 
           {status === "submitted" && <LoadingMessage />}
@@ -198,7 +202,7 @@ function ConversationPromptInput() {
         </PromptInput>
       </div>
     </div>
-  )
+  );
 }
 
-export default ConversationPromptInput
+export default ConversationPromptInput;

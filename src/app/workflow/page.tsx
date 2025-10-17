@@ -38,11 +38,13 @@ import { ArrowUp } from "lucide-react";
 
 import { ScriptInputNode } from "./components/script-input-node";
 import { AudioOutputNode } from "./components/audio-output-node";
+import { VoiceCustomizationNode } from "./components/voice-customization-node";
 import { askAgent } from "../_actions";
 
 const nodeTypes: NodeTypes = {
   scriptInput: ScriptInputNode,
   audioOutput: AudioOutputNode,
+  voiceCustomization: VoiceCustomizationNode,
 };
 
 type WorkflowData = {
@@ -53,6 +55,8 @@ type WorkflowData = {
   onGenerate?: () => void;
   isGenerating?: boolean;
   audioUrl?: string;
+  selectedTone?: string;
+  onToneSelect?: (tone: string) => void;
 };
 
 type CustomNode = Node<WorkflowData>;
@@ -62,7 +66,7 @@ const initialNodes: CustomNode[] = [
   {
     id: "1",
     type: "scriptInput",
-    position: { x: 100, y: 150 },
+    position: { x: 50, y: 150 },
     data: {
       script: "",
       onScriptChange: () => {},
@@ -75,9 +79,20 @@ const initialNodes: CustomNode[] = [
     style: { width: 320 },
   },
   {
+    id: "3",
+    type: "voiceCustomization",
+    position: { x: 450, y: 150 },
+    data: {
+      selectedTone: "professional",
+      onToneSelect: () => {},
+    },
+    dragHandle: ".drag-handle",
+    style: { width: 300 },
+  },
+  {
     id: "2",
     type: "audioOutput",
-    position: { x: 600, y: 150 },
+    position: { x: 850, y: 150 },
     data: {
       audioUrl: undefined,
     },
@@ -88,17 +103,34 @@ const initialNodes: CustomNode[] = [
 
 const initialEdges: Edge[] = [
   {
-    id: "e1-2",
+    id: "e1-3",
     source: "1",
+    target: "3",
+    type: "smoothstep",
+    animated: true,
+    style: {
+      stroke: "#6366f1",
+      strokeWidth: 3,
+      strokeDasharray: "5 5",
+    },
+    markerEnd: {
+      type: MarkerType.Arrow,
+      color: "#6366f1",
+    },
+  },
+  {
+    id: "e3-2",
+    source: "3",
     target: "2",
     type: "smoothstep",
     animated: true,
     style: {
-      stroke: "url(#edge-gradient)",
+      stroke: "#6366f1",
       strokeWidth: 3,
+      strokeDasharray: "5 5",
     },
     markerEnd: {
-      type: MarkerType.ArrowClosed,
+      type: MarkerType.Arrow,
       color: "#6366f1",
     },
   },
@@ -108,6 +140,7 @@ export default function WorkflowPage() {
   const [script, setScript] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [tone, setTone] = useState("professional");
   const [messages, setMessages] = useState<
     { id: string; role: string; content: string }[]
   >([]);
@@ -131,7 +164,7 @@ export default function WorkflowPage() {
     setError(null);
 
     try {
-      const response = await askAgent(input);
+      const response = await askAgent(input, "default", tone);
       const assistantMessage = {
         id: String(Date.now()),
         role: "assistant",
@@ -170,6 +203,7 @@ export default function WorkflowPage() {
           return {
             ...node,
             data: {
+              ...node.data,
               script,
               onScriptChange: (value: string) => setScript(value),
               onPaste: async () => {
@@ -185,7 +219,7 @@ export default function WorkflowPage() {
                 if (!script) return;
                 setIsGenerating(true);
                 try {
-                  const response = await askAgent(script);
+                  const response = await askAgent(script, "default", tone);
                   if ("audioUrl" in response && response.audioUrl) {
                     setAudioUrl(response.audioUrl);
                   }
@@ -203,14 +237,25 @@ export default function WorkflowPage() {
           return {
             ...node,
             data: {
+              ...node.data,
               audioUrl,
+            },
+          };
+        }
+        if (node.id === "3") {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              selectedTone: tone,
+              onToneSelect: setTone,
             },
           };
         }
         return node;
       }),
     );
-  }, [script, audioUrl, isGenerating, setNodes]);
+  }, [script, audioUrl, isGenerating, tone, setNodes]);
 
   useEffect(() => {
     updateNodes();
@@ -370,34 +415,6 @@ export default function WorkflowPage() {
         >
           <Controls />
           <Background gap={12} size={1} />
-          <svg style={{ position: "absolute", width: 0, height: 0 }}>
-            <defs>
-              <linearGradient
-                id="edge-gradient"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="0%"
-              >
-                <stop offset="0%" stopColor="#6366f1" stopOpacity={0.1}>
-                  <animate
-                    attributeName="offset"
-                    values="0%;100%"
-                    dur="2s"
-                    repeatCount="indefinite"
-                  />
-                </stop>
-                <stop offset="100%" stopColor="#6366f1" stopOpacity={0.8}>
-                  <animate
-                    attributeName="offset"
-                    values="0%;100%"
-                    dur="2s"
-                    repeatCount="indefinite"
-                  />
-                </stop>
-              </linearGradient>
-            </defs>
-          </svg>
         </ReactFlow>
       </div>
     </div>

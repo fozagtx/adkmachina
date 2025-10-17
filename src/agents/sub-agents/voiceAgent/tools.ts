@@ -1,7 +1,5 @@
 import { createTool, type Agent } from "@iqai/adk";
 import { z } from "zod";
-import path from "node:path";
-import fs from "node:fs/promises";
 
 const ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
@@ -47,41 +45,16 @@ export const voiceTool = createTool({
       console.log("API response received, processing audio buffer...");
       const audioBuffer = await response.arrayBuffer();
       console.log("Audio buffer size:", audioBuffer.byteLength, "bytes");
-      const timestamp = Date.now();
-      const audioFilename = `voiceover_${timestamp}.mp3`;
-      const scriptFilename = `script_${timestamp}.txt`;
 
-      const audioPath = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        "voiceovers",
-        audioFilename,
-      );
-      const scriptPath = path.join(
-        process.cwd(),
-        "public",
-        "uploads",
-        "voiceovers",
-        scriptFilename,
-      );
+      const base64Audio = Buffer.from(audioBuffer).toString("base64");
+      const audioUrl = `data:audio/mpeg;base64,${base64Audio}`;
 
-      await fs.mkdir(path.dirname(audioPath), { recursive: true });
-
-      await fs.writeFile(audioPath, Buffer.from(audioBuffer));
-      await fs.writeFile(scriptPath, script);
-
-      console.log("Files written successfully:", {
-        audioPath,
-        scriptPath,
-        audioSize: audioBuffer.byteLength,
-      });
+      console.log("Generated data URL for audio.");
 
       return {
         success: true,
         script,
-        scriptUrl: `/uploads/voiceovers/${scriptFilename}`,
-        audioUrl: `/uploads/voiceovers/${audioFilename}`,
+        audioUrl: audioUrl,
         voiceType: tone,
         avatarType,
       };
