@@ -50,14 +50,54 @@ export async function askAgent(
       );
     };
 
-    if (isAudioResponse(result)) {
+    const parseAudioResponse = (
+      payload: unknown,
+    ): {
+      success: boolean;
+      script: string;
+      audioUrl: string;
+      voiceType: string;
+      avatarType: string;
+    } | null => {
+      if (isAudioResponse(payload)) {
+        return payload;
+      }
+
+      if (typeof payload !== "string") {
+        return null;
+      }
+
+      const trimmed = payload.trim();
+      const jsonBlockMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
+      const jsonCandidate = jsonBlockMatch
+        ? jsonBlockMatch[1].trim()
+        : trimmed.startsWith("{")
+        ? trimmed
+        : null;
+
+      if (!jsonCandidate) {
+        return null;
+      }
+
+      try {
+        const parsed = JSON.parse(jsonCandidate);
+        return isAudioResponse(parsed) ? parsed : null;
+      } catch (parseError) {
+        console.warn("Failed to parse agent audio response:", parseError);
+        return null;
+      }
+    };
+
+    const audioResult = parseAudioResponse(result);
+
+    if (audioResult) {
       return {
         success: true,
-        content: result.script,
-        script: result.script,
-        audioUrl: result.audioUrl,
-        voiceType: result.voiceType,
-        avatarType: result.avatarType,
+        content: audioResult.script,
+        script: audioResult.script,
+        audioUrl: audioResult.audioUrl,
+        voiceType: audioResult.voiceType,
+        avatarType: audioResult.avatarType,
       };
     }
 

@@ -1,21 +1,52 @@
-import { createTool, type Agent } from "@iqai/adk";
-import { z } from "zod";
+import { createTool } from "@iqai/adk";
+import { z } from "@iqai/adk/node_modules/zod";
 
 const ELEVENLABS_BASE_URL = "https://api.elevenlabs.io/v1";
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
-export const voiceTool = createTool({
+const voiceGenerationSchema = z.object({
+  script: z
+    .string()
+    .min(1, "Script text is required to generate audio.")
+    .describe("The final script text that should be transformed into a voice-over."),
+  avatarType: z
+    .enum(["default", "fitness", "beauty", "tech", "lifestyle"])
+    .default("default")
+    .describe("Avatar persona or category the voice should align with."),
+  tone: z
+    .enum(["energetic", "calm", "professional", "funny", "dramatic"])
+    .default("professional")
+    .describe("Desired voice tone for the generated audio."),
+});
+
+type VoiceGenerationInput = z.infer<typeof voiceGenerationSchema>;
+
+export const voiceTool = createTool<VoiceGenerationInput>({
   name: "generate_voiceover",
   description:
     "Generate viral voiceover script and audio for UGC avatars using ElevenLabs",
-  fn: async ({ script, avatarType, tone }) => {
+  schema: voiceGenerationSchema,
+  fn: async ({ script, avatarType, tone }: VoiceGenerationInput) => {
+    const normalizedAvatarType = avatarType ?? "default";
+    const normalizedTone = tone ?? "professional";
+
+    if (!ELEVENLABS_API_KEY) {
+      const missingKeyMessage =
+        "Missing ELEVENLABS_API_KEY environment variable. Audio generation requires a valid ElevenLabs API key.";
+      console.error(missingKeyMessage);
+      return {
+        success: false,
+        error: missingKeyMessage,
+      };
+    }
+
     try {
       console.log("Generating voiceover with params:", {
         script,
-        avatarType,
-        tone,
+        avatarType: normalizedAvatarType,
+        tone: normalizedTone,
       });
-      const voiceId = selectVoiceId(tone, avatarType);
+      const voiceId = selectVoiceId(normalizedTone, normalizedAvatarType);
       console.log("Selected voice ID:", voiceId);
 
       const response = await fetch(
@@ -24,7 +55,7 @@ export const voiceTool = createTool({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "xi-api-key": ELEVENLABS_API_KEY || "",
+            "xi-api-key": ELEVENLABS_API_KEY,
           },
           body: JSON.stringify({
             text: script,
@@ -38,8 +69,11 @@ export const voiceTool = createTool({
       );
 
       if (!response.ok) {
-        console.error("ElevenLabs API error:", response.statusText);
-        throw new Error(`ElevenLabs API error: ${response.statusText}`);
+        const errorText = await response.text().catch(
+          () => response.statusText,
+        );
+        console.error("ElevenLabs API error:", errorText);
+        throw new Error(`ElevenLabs API error: ${errorText}`);
       }
 
       console.log("API response received, processing audio buffer...");
@@ -54,9 +88,9 @@ export const voiceTool = createTool({
       return {
         success: true,
         script,
-        audioUrl: audioUrl,
-        voiceType: tone,
-        avatarType,
+        audioUrl,
+        voiceType: normalizedTone,
+        avatarType: normalizedAvatarType,
       };
     } catch (error) {
       const errorMessage =
@@ -77,7 +111,10 @@ function selectVoiceId(tone: string, avatarType: string): string {
     professional: "ErXwobaYiN019PkySvjV", // Antoni
     funny: "TxGEqnHWrfWFTfGW9XjX", // Josh
     dramatic: "VR6AewLTigWG4xSOukaG", // Arnold
+    default: "ErXwobaYiN019PkySvjV", // Default to professional voice
   };
 
-  return voices[tone.toLowerCase()] || voices.professional;
+  const normalizedTone = tone.toLowerCase();
+
+  return voices[normalizedTone] || voices.professional;
 }
