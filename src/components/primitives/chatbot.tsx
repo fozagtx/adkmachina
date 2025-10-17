@@ -18,9 +18,7 @@ import {
 } from "@/components/prompt-kit/prompt-input"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
-import type { UIMessage } from "ai"
+import { useChat, type UIMessage } from "@ai-sdk/react"
 import {
   AlertTriangle,
   ArrowUp,
@@ -134,11 +132,7 @@ ErrorMessage.displayName = "ErrorMessage"
 function ConversationPromptInput() {
   const [input, setInput] = useState("")
 
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/primitives/chatbot",
-    }),
-  })
+  const { messages, sendMessage, status, error } = useChat()
 
   const handleSubmit = () => {
     if (!input.trim()) return

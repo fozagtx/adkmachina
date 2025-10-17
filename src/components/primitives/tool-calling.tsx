@@ -21,8 +21,6 @@ import type { ToolPart } from "@/components/prompt-kit/tool"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useChat } from "@ai-sdk/react"
-import { DefaultChatTransport } from "ai"
-import type { UIMessage, UIMessagePart } from "ai"
 import {
   AlertTriangle,
   ArrowUp,
@@ -33,17 +31,8 @@ import {
 import { memo, useState } from "react"
 
 type MessageComponentProps = {
-  message: UIMessage
+  message: any
   isLastMessage: boolean
-}
-
-const renderToolPart = (
-  part: UIMessagePart<any, any>,
-  index: number
-): React.ReactNode => {
-  if (!part.type?.startsWith("tool-")) return null
-
-  return <Tool key={`${part.type}-${index}`} toolPart={part as ToolPart} />
 }
 
 export const MessageComponent = memo(
@@ -64,7 +53,9 @@ export const MessageComponent = memo(
                 .filter(
                   (part: any) => part.type && part.type.startsWith("tool-")
                 )
-                .map((part: any, index: number) => renderToolPart(part, index))}
+                .map((part: any, index: number) => (
+                  <Tool key={part.id} toolPart={part} />
+                ))}
             </div>
             <MessageContent
               className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
@@ -154,11 +145,7 @@ ErrorMessage.displayName = "ErrorMessage"
 function ToolCallingChatbot() {
   const [input, setInput] = useState("")
 
-  const { messages, sendMessage, status, error } = useChat({
-    transport: new DefaultChatTransport({
-      api: "/api/primitives/tool-calling",
-    }),
-  })
+  const { messages, sendMessage, status, error } = useChat()
 
   const handleSubmit = () => {
     if (!input.trim()) return

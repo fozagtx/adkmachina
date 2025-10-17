@@ -10,15 +10,6 @@ export const voiceTool = createTool({
   name: "generate_voiceover",
   description:
     "Generate viral voiceover script and audio for UGC avatars using ElevenLabs",
-  schema: z.object({
-    script: z.string().describe("The script for the voiceover"),
-    avatarType: z
-      .string()
-      .describe("Type of avatar: fitness, beauty, tech, lifestyle, etc"),
-    tone: z
-      .string()
-      .describe("Voice tone: energetic, calm, professional, funny, dramatic"),
-  }),
   fn: async ({ script, avatarType, tone }) => {
     try {
       console.log("Generating voiceover with params:", {
