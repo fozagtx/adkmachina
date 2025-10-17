@@ -16,7 +16,6 @@ import {
 import { Button } from "../ui/button";
 import { AlertTriangle, ArrowUp, Copy } from "lucide-react";
 import { DotsLoader } from "./loader";
-import { useChat } from "ai/react";
 
 export function ChatContainer({
   messages,
@@ -29,7 +28,6 @@ export function ChatContainer({
   error: any;
   onMessageAction: (message: any, action: any) => void;
 }) {
-  const { input, handleInputChange, handleSubmit } = useChat();
   return (
     <div className="flex flex-col h-full">
       <ChatContainerRoot className="flex-1 overflow-y-auto">
@@ -39,13 +37,13 @@ export function ChatContainer({
               key={index}
               className={cn(
                 "flex w-full flex-col gap-2",
-                message.role === "assistant" ? "items-start" : "items-end"
+                message.role === "assistant" ? "items-start" : "items-end",
               )}
             >
               <div
                 className={cn(
                   "group flex w-full flex-col gap-2",
-                  message.role === "assistant" ? "items-start" : "items-end"
+                  message.role === "assistant" ? "items-start" : "items-end",
                 )}
               >
                 <MessageContent
@@ -53,7 +51,7 @@ export function ChatContainer({
                     "rounded-xl px-4 py-2",
                     message.role === "assistant"
                       ? "bg-gray-100"
-                      : "bg-blue-500 text-white"
+                      : "bg-blue-500 text-white",
                   )}
                   markdown={message.role === "assistant"}
                 >
@@ -62,14 +60,19 @@ export function ChatContainer({
                 {message.role === "assistant" && (
                   <MessageActions
                     className={cn(
-                      "opacity-0 transition-opacity group-hover:opacity-100"
+                      "opacity-0 transition-opacity group-hover:opacity-100",
                     )}
                   >
-                    <MessageAction
-                      id="copy"
-                      icon={Copy}
-                      onClick={() => onMessageAction(message, { id: "copy" })}
-                    />
+                    <MessageAction tooltip="Copy" delayDuration={100}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="rounded-full"
+                        onClick={() => onMessageAction(message, { id: "copy" })}
+                      >
+                        <Copy />
+                      </Button>
+                    </MessageAction>
                   </MessageActions>
                 )}
               </div>
@@ -92,30 +95,7 @@ export function ChatContainer({
           )}
         </ChatContainerContent>
       </ChatContainerRoot>
-      <div className="p-4 border-t border-gray-200">
-        <form onSubmit={handleSubmit}>
-          <PromptInput
-            isLoading={isLoading}
-            value={input}
-            onValueChange={handleInputChange}
-            className="border-input bg-popover relative z-10 w-full rounded-xl border shadow-sm"
-          >
-            <PromptInputTextarea
-              placeholder="Ask for content ideas..."
-              className="min-h-[44px] p-3 text-base"
-            />
-            <PromptInputActions className="px-3 py-2 flex justify-end">
-              <Button
-                size="icon"
-                disabled={!input.trim() || isLoading}
-                className="rounded-lg"
-              >
-                <ArrowUp size={18} />
-              </Button>
-            </PromptInputActions>
-          </PromptInput>
-        </form>
-      </div>
+      <div className="p-4 border-t border-gray-200"></div>
     </div>
   );
 }

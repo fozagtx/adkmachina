@@ -19,7 +19,7 @@ export const ScriptInputNode = ({
   data: ScriptInputNodeData;
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-[calc(100vw-2rem)] sm:w-[450px] max-w-[450px] border-2 border-gray-200">
+    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-[320px] border-2 border-gray-200">
       <div className="flex items-center gap-2 mb-4 drag-handle cursor-move">
         <FileText className="h-5 w-5" />
         <h3 className="font-semibold text-lg">Script Input</h3>
@@ -28,7 +28,7 @@ export const ScriptInputNode = ({
         value={data.script || ""}
         onChange={(e) => data.onScriptChange?.(e.target.value)}
         placeholder="Paste or type your script here..."
-        className="w-full h-32 sm:h-48 p-2 sm:p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
+        className="w-full h-24 p-2 sm:p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
       />
       <div className="text-xs sm:text-sm text-gray-500 mt-2">
         {(data.script || "").length} chars ·{" "}
@@ -37,7 +37,7 @@ export const ScriptInputNode = ({
       <div className="flex gap-2 mt-4">
         <Button
           variant="outline"
-          className="flex-1 text-xs sm:text-sm h-8 sm:h-10"
+          className="flex-1 text-xs h-8"
           onClick={data.onPaste || (() => {})}
         >
           Paste
@@ -53,11 +53,11 @@ export const ScriptInputNode = ({
       <Button
         onClick={data.onGenerate || (() => {})}
         disabled={!data.script || data.isGenerating}
-        className="w-full mt-3 bg-gray-700 hover:bg-gray-800 text-xs sm:text-sm h-8 sm:h-10"
+        className="w-full mt-3 bg-gray-700 hover:bg-gray-800 text-xs h-8"
       >
         {data.isGenerating ? "Generating..." : "Generate Voice-Over"}
       </Button>
-      <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-2 sm:p-3 rounded text-[10px] sm:text-xs">
+      <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-2 rounded">
         <span className="font-semibold">Tips:</span> Write in a conversational
         tone, include hooks, and keep scripts between 50-200 words for best
         results.
