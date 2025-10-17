@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Volume2 } from "lucide-react";
+import { Handle, Position } from "@xyflow/react";
 
 interface AudioOutputNodeProps {
   data: {
@@ -13,6 +14,11 @@ export const AudioOutputNode = ({ data }: AudioOutputNodeProps) => {
   console.log("Audio output node rendered with URL:", data.audioUrl);
   return (
     <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-[calc(100vw-2rem)] sm:w-[400px] max-w-[400px] border-2 border-gray-200">
+      <Handle
+        type="target"
+        position={Position.Left}
+        style={{ background: "#555" }}
+      />
       <div className="flex items-center gap-2 mb-4 drag-handle cursor-move">
         <Volume2 className="h-4 sm:h-5 w-4 sm:w-5" />
         <div>

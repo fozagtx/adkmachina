@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { FileText, Trash2 } from "lucide-react";
+import { Handle, Position } from "@xyflow/react";
 
 interface ScriptInputNodeData {
   script: string;
@@ -61,6 +62,12 @@ export const ScriptInputNode = ({
         tone, include hooks, and keep scripts between 50-200 words for best
         results.
       </div>
+      <Handle
+        type="source"
+        position={Position.Right}
+        id="a"
+        style={{ background: "#555" }}
+      />
     </div>
   );
 };
