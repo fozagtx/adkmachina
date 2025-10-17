@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { FileText, Trash2 } from "lucide-react";
 import { Handle, Position } from "@xyflow/react";
+import { FileText, Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ScriptInputNodeData {
   script: string;
@@ -19,45 +19,49 @@ export const ScriptInputNode = ({
   data: ScriptInputNodeData;
 }) => {
   return (
-    <div className="bg-white rounded-2xl shadow-xl p-4 sm:p-6 w-[320px] border-2 border-gray-200">
-      <div className="flex items-center gap-2 mb-4 drag-handle cursor-move">
+    <div className="w-full max-w-[340px] rounded-2xl border-2 border-gray-200 bg-white p-4 shadow-xl sm:p-6">
+      <div className="mb-4 flex items-center gap-2 drag-handle cursor-move">
         <FileText className="h-5 w-5" />
-        <h3 className="font-semibold text-lg">Script Input</h3>
+        <h3 className="text-lg font-semibold">Script Input</h3>
       </div>
       <textarea
         value={data.script || ""}
         onChange={(e) => data.onScriptChange?.(e.target.value)}
         placeholder="Paste or type your script here..."
-        className="w-full h-24 p-2 sm:p-3 border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
+        className="h-28 w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm focus:border-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 sm:h-32 sm:p-4"
+        aria-label="Script input"
       />
-      <div className="text-xs sm:text-sm text-gray-500 mt-2">
+      <div className="mt-2 text-xs text-gray-500 sm:text-sm">
         {(data.script || "").length} chars ·{" "}
         {(data.script || "").split(/\s+/).filter(Boolean).length} words
       </div>
-      <div className="flex gap-2 mt-4">
+      <div className="mt-4 flex gap-2">
         <Button
           variant="outline"
-          className="flex-1 text-xs h-8"
+          className="h-9 flex-1 rounded-lg text-xs font-medium sm:text-sm"
           onClick={data.onPaste || (() => {})}
+          disabled={data.isGenerating}
         >
           Paste
         </Button>
         <Button
           variant="ghost"
           size="icon"
+          className="h-9 w-9 rounded-lg"
           onClick={data.onClear || (() => {})}
+          disabled={data.isGenerating}
         >
           <Trash2 className="h-4 w-4 text-red-500" />
         </Button>
       </div>
       <Button
         onClick={data.onGenerate || (() => {})}
-        disabled={!data.script || data.isGenerating}
-        className="w-full mt-3 bg-gray-700 hover:bg-gray-800 text-xs h-8"
+        disabled={!data.script?.trim() || data.isGenerating}
+        className="mt-3 h-9 w-full rounded-lg bg-gray-800 text-xs font-semibold text-white transition hover:bg-gray-900"
       >
         {data.isGenerating ? "Generating..." : "Generate Voice-Over"}
       </Button>
-      <div className="mt-4 text-xs text-gray-600 bg-gray-50 p-2 rounded">
+      <div className="mt-4 rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
         <span className="font-semibold">Tips:</span> Write in a conversational
         tone, include hooks, and keep scripts between 50-200 words for best
         results.
@@ -65,8 +69,8 @@ export const ScriptInputNode = ({
       <Handle
         type="source"
         position={Position.Right}
-        id="a"
-        style={{ background: "#555" }}
+        id="script-output"
+        style={{ background: "#6366f1" }}
       />
     </div>
   );
