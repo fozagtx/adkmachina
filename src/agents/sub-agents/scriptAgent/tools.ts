@@ -4,11 +4,6 @@ import { z } from "zod";
 export const scriptIdeationTool = createTool({
   name: "generate_script_ideas",
   description: "Generate viral script ideas and hooks for UGC content",
-  schema: z.object({
-    avatarType: z.string().describe("Type of avatar: fitness, beauty, tech, lifestyle"),
-    niche: z.string().describe("Specific niche or topic area"),
-    goalType: z.enum(["educational", "entertaining", "inspiring", "promotional"]).describe("Content goal"),
-  }),
   fn: async ({ avatarType, niche, goalType }) => {
     const ideas = generateScriptIdeas(avatarType, niche, goalType);
     const hooks = generateViralHooks(niche, goalType);

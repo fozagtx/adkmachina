@@ -21,12 +21,7 @@ import {
   ChatContainerRoot,
 } from "@/components/prompt-kit/chat-container";
 import { DotsLoader } from "@/components/prompt-kit/loader";
-import {
-  Message,
-  MessageAction,
-  MessageActions,
-  MessageContent,
-} from "@/components/prompt-kit/message";
+import { Message, MessageContent } from "@/components/prompt-kit/message";
 import {
   PromptInput,
   PromptInputActions,
@@ -34,7 +29,7 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, ArrowUp, Copy } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 
 import { ScriptInputNode } from "./components/script-input-node";
 import { AudioOutputNode } from "./components/audio-output-node";
@@ -43,7 +38,7 @@ import { askAgent } from "../_actions";
 const nodeTypes: NodeTypes = {
   scriptInput: ScriptInputNode,
   audioOutput: AudioOutputNode,
-};
+}
 
 type ChatMessage = {
   id: string;
