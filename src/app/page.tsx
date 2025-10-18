@@ -1,9 +1,17 @@
 import { ArrowRight, Circle } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LandingPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-pink-100 via-pink-50 to-rose-100 text-[#2b162b]">
+      <Image
+        src="/noice.png"
+        alt="Background"
+        fill
+        className="object-cover object-center -z-10"
+        priority
+      />
       <main className="flex flex-1 animate-fade_in flex-col items-center justify-center p-6 text-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="mb-4">
