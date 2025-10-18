@@ -15,7 +15,7 @@ import {
 } from "@xyflow/react";
 import { useCallback, useEffect, useState } from "react";
 import "@xyflow/react/dist/style.css";
-import { AlertTriangle, ArrowUp } from "lucide-react";
+import { AlertTriangle, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -147,6 +147,7 @@ export default function WorkflowPage() {
     "ready",
   );
   const [error, setError] = useState<Error | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const handleSubmit = async () => {
     if (!input.trim() || status === "submitted") return;
@@ -289,145 +290,186 @@ export default function WorkflowPage() {
   }, [updateNodes]);
 
   return (
-    <div className="h-screen flex flex-col lg:flex-row bg-[#D3D1DE]">
-      <div className="w-full lg:w-96 border-b lg:border-b-0 lg:border-r border-gray-200 bg-white flex flex-col max-h-[40vh] lg:max-h-screen">
-        <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
-          <ChatContainerContent className="space-y-12 px-4 py-12">
-            {messages.length === 0 && (
-              <div className="text-center text-gray-500 py-8">
-                <p className="text-sm">
-                  Ask the AI to generate scripts or voice-overs, or use the
-                  workflow nodes to create content.
-                </p>
-              </div>
-            )}
-            {messages.map((message, index) => {
-              const isLastMessage = index === messages.length - 1;
-              const isAssistant = message.role === "assistant";
-              return (
-                <PromptMessage
-                  key={message.id}
-                  className={cn(
-                    "mx-auto flex w-full max-w-3xl flex-col gap-2 px-2 md:px-10",
-                    isAssistant ? "items-start" : "items-end",
-                  )}
-                >
-                  {isAssistant ? (
-                    <div className="group flex w-full flex-col gap-0">
-                      <MessageContent
-                        className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
-                        markdown={true}
-                      >
-                        {message.content || ""}
-                      </MessageContent>
-                      <MessageActions
-                        className={cn(
-                          "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                          isLastMessage && "opacity-100",
-                        )}
-                      >
-                        <MessageAction tooltip="Copy" delayDuration={100}>
-                          <CopyButton
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onCopy={() =>
-                              navigator.clipboard.writeText(message.content)
-                            }
-                          />
-                        </MessageAction>
-                      </MessageActions>
-                    </div>
-                  ) : (
-                    <div className="group flex w-full flex-col items-end gap-1">
-                      <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 whitespace-pre-wrap sm:max-w-[75%]">
-                        {message.content}
-                      </MessageContent>
-                      <MessageActions
-                        className={cn(
-                          "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
-                        )}
-                      >
-                        <MessageAction tooltip="Copy" delayDuration={100}>
-                          <CopyButton
-                            variant="ghost"
-                            size="icon"
-                            className="rounded-full"
-                            onCopy={() =>
-                              navigator.clipboard.writeText(message.content)
-                            }
-                          />
-                        </MessageAction>
-                      </MessageActions>
-                    </div>
-                  )}
-                </PromptMessage>
-              );
-            })}
-            {status === "submitted" && (
-              <PromptMessage className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
-                <div className="group flex w-full flex-col gap-0">
-                  <div className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0">
-                    <div className="flex space-x-2">
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.3s]"></div>
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.15s]"></div>
-                      <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
-                    </div>
-                  </div>
-                </div>
-              </PromptMessage>
-            )}
-            {status === "error" && error && (
-              <PromptMessage className="not-prose mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
-                <div className="group flex w-full flex-col items-start gap-0">
-                  <div className="text-primary flex min-w-0 flex-1 flex-row items-center gap-2 rounded-lg border-2 border-red-300 bg-red-300/20 px-2 py-1">
-                    <AlertTriangle size={16} className="text-red-500" />
-                    <p className="text-red-500">{error.message}</p>
-                  </div>
-                </div>
-              </PromptMessage>
-            )}
-          </ChatContainerContent>
-        </ChatContainerRoot>
-        <div className="inset-x-0 bottom-0 mx-auto w-full max-w-3xl shrink-0 px-3 pb-3 md:px-5 md:pb-5">
-          <PromptInput
-            isLoading={status !== "ready"}
-            value={input}
-            onValueChange={setInput}
-            onSubmit={handleSubmit}
-            className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+    <div className="flex h-screen flex-col gap-4 bg-[#D3D1DE] p-4 lg:flex-row">
+      <aside
+        className={cn(
+          "relative flex w-full max-h-[40vh] flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl transition-all duration-300 ease-in-out lg:max-h-full",
+          isSidebarCollapsed ? "lg:w-16" : "lg:w-96",
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center gap-2 border-b border-gray-100 px-4 py-3",
+            isSidebarCollapsed ? "justify-center" : "justify-between",
+          )}
+        >
+          {!isSidebarCollapsed && (
+            <span className="text-sm font-semibold text-gray-700">
+              AI Assistant
+            </span>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarCollapsed((prev) => !prev)}
+            aria-label={
+              isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+            }
+            aria-pressed={isSidebarCollapsed}
+            className="rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
           >
-            <div className="flex flex-col">
-              <PromptInputTextarea
-                placeholder="Ask the AI agent..."
-                className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
-              />
-              <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 p-2">
-                <div />
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="icon"
-                    disabled={
-                      !input.trim() ||
-                      (status !== "ready" && status !== "error")
-                    }
-                    onClick={handleSubmit}
-                    className="size-9 rounded-full"
-                  >
-                    {status === "ready" || status === "error" ? (
-                      <ArrowUp size={18} />
-                    ) : (
-                      <span className="size-3 rounded-xs bg-white" />
-                    )}
-                  </Button>
-                </div>
-              </PromptInputActions>
-            </div>
-          </PromptInput>
+            {isSidebarCollapsed ? (
+              <ChevronRight className="size-5" />
+            ) : (
+              <ChevronLeft className="size-5" />
+            )}
+          </Button>
         </div>
-      </div>
 
-      <div className="flex-1 h-[60vh] lg:h-auto">
+        <div
+          className={cn(
+            "flex flex-1 flex-col",
+            isSidebarCollapsed && "hidden",
+          )}
+        >
+          <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
+            <ChatContainerContent className="space-y-12 px-4 py-12">
+              {messages.length === 0 && (
+                <div className="text-center text-gray-500 py-8">
+                  <p className="text-sm">
+                    Ask the AI to generate scripts or voice-overs, or use the
+                    workflow nodes to create content.
+                  </p>
+                </div>
+              )}
+              {messages.map((message, index) => {
+                const isLastMessage = index === messages.length - 1;
+                const isAssistant = message.role === "assistant";
+                return (
+                  <PromptMessage
+                    key={message.id}
+                    className={cn(
+                      "mx-auto flex w-full max-w-3xl flex-col gap-2 px-2 md:px-10",
+                      isAssistant ? "items-start" : "items-end",
+                    )}
+                  >
+                    {isAssistant ? (
+                      <div className="group flex w-full flex-col gap-0">
+                        <MessageContent
+                          className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
+                          markdown={true}
+                        >
+                          {message.content || ""}
+                        </MessageContent>
+                        <MessageActions
+                          className={cn(
+                            "-ml-2.5 flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                            isLastMessage && "opacity-100",
+                          )}
+                        >
+                          <MessageAction tooltip="Copy" delayDuration={100}>
+                            <CopyButton
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onCopy={() =>
+                                navigator.clipboard.writeText(message.content)
+                              }
+                            />
+                          </MessageAction>
+                        </MessageActions>
+                      </div>
+                    ) : (
+                      <div className="group flex w-full flex-col items-end gap-1">
+                        <MessageContent className="bg-muted text-primary max-w-[85%] rounded-3xl px-5 py-2.5 whitespace-pre-wrap sm:max-w-[75%]">
+                          {message.content}
+                        </MessageContent>
+                        <MessageActions
+                          className={cn(
+                            "flex gap-0 opacity-0 transition-opacity duration-150 group-hover:opacity-100",
+                          )}
+                        >
+                          <MessageAction tooltip="Copy" delayDuration={100}>
+                            <CopyButton
+                              variant="ghost"
+                              size="icon"
+                              className="rounded-full"
+                              onCopy={() =>
+                                navigator.clipboard.writeText(message.content)
+                              }
+                            />
+                          </MessageAction>
+                        </MessageActions>
+                      </div>
+                    )}
+                  </PromptMessage>
+                );
+              })}
+              {status === "submitted" && (
+                <PromptMessage className="mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
+                  <div className="group flex w-full flex-col gap-0">
+                    <div className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0">
+                      <div className="flex space-x-2">
+                        <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.3s]"></div>
+                        <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce [animation-delay:-0.15s]"></div>
+                        <div className="h-2 w-2 rounded-full bg-gray-400 animate-bounce"></div>
+                      </div>
+                    </div>
+                  </div>
+                </PromptMessage>
+              )}
+              {status === "error" && error && (
+                <PromptMessage className="not-prose mx-auto flex w-full max-w-3xl flex-col items-start gap-2 px-0 md:px-10">
+                  <div className="group flex w-full flex-col items-start gap-0">
+                    <div className="text-primary flex min-w-0 flex-1 flex-row items-center gap-2 rounded-lg border-2 border-red-300 bg-red-300/20 px-2 py-1">
+                      <AlertTriangle size={16} className="text-red-500" />
+                      <p className="text-red-500">{error.message}</p>
+                    </div>
+                  </div>
+                </PromptMessage>
+              )}
+            </ChatContainerContent>
+          </ChatContainerRoot>
+          <div className="inset-x-0 bottom-0 mx-auto w-full max-w-3xl shrink-0 px-3 pb-3 md:px-5 md:pb-5">
+            <PromptInput
+              isLoading={status !== "ready"}
+              value={input}
+              onValueChange={setInput}
+              onSubmit={handleSubmit}
+              className="border-input bg-popover relative z-10 w-full rounded-3xl border p-0 pt-1 shadow-xs"
+            >
+              <div className="flex flex-col">
+                <PromptInputTextarea
+                  placeholder="Ask the AI agent..."
+                  className="min-h-[44px] pt-3 pl-4 text-base leading-[1.3] sm:text-base md:text-base"
+                />
+                <PromptInputActions className="mt-3 flex w-full items-center justify-between gap-2 p-2">
+                  <div />
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="icon"
+                      disabled={
+                        !input.trim() ||
+                        (status !== "ready" && status !== "error")
+                      }
+                      onClick={handleSubmit}
+                      className="size-9 rounded-full"
+                    >
+                      {status === "ready" || status === "error" ? (
+                        <ArrowUp size={18} />
+                      ) : (
+                        <span className="size-3 rounded-xs bg-white" />
+                      )}
+                    </Button>
+                  </div>
+                </PromptInputActions>
+              </div>
+            </PromptInput>
+          </div>
+        </div>
+      </aside>
+
+      <div className="flex-1 min-h-[60vh] lg:h-full">
         <ReactFlow
           className="touch-none"
           nodes={nodes}
