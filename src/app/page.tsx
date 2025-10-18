@@ -11,14 +11,12 @@ export default function LandingPage() {
           src="/noice.png"
           alt="Background"
           fill
-          className="object-cover object-center brightness-50 contrast-75"
+          className="object-cover object-center brightness-25 contrast-50"
           priority
         />
-        <Header />
-        {/* Strong overlay */}
-        <div className="absolute inset-0 bg-black/70 mix-blend-multiply" />
       </div>
 
+      <Header />
       <main className="flex flex-1 animate-fade_in flex-col items-center justify-center p-6 text-center">
         <div className="flex flex-col items-center space-y-4">
           <div className="mb-4">

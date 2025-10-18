@@ -24,6 +24,7 @@
     "lucide-react": "latest",
     "marked": "latest",
     "next": "15.5.5",
+    "playwright": "^1.56.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-markdown": "latest",
