@@ -34,7 +34,8 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { askAgent } from "../_actions";
+import type { VoiceTone } from "@/agents/sub-agents/voiceAgent/voiceover";
+import { askAgent, generateVoiceover } from "../_actions";
 import { AudioOutputNode } from "./components/audio-output-node";
 import { ScriptInputNode } from "./components/script-input-node";
 import { VoiceCustomizationNode } from "./components/voice-customization-node";
@@ -53,8 +54,8 @@ type WorkflowData = {
   onGenerate?: () => void;
   isGenerating?: boolean;
   audioUrl?: string;
-  selectedTone?: string;
-  onToneSelect?: (tone: string) => void;
+  selectedTone?: VoiceTone;
+  onToneSelect?: (tone: VoiceTone) => void;
 };
 
 type CustomNode = Node<WorkflowData>;
@@ -138,7 +139,7 @@ export default function WorkflowPage() {
   const [script, setScript] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [tone, setTone] = useState("professional");
+  const [tone, setTone] = useState<VoiceTone>("professional");
   const [messages, setMessages] = useState<
     { id: string; role: string; content: string }[]
   >([]);
@@ -221,25 +222,47 @@ export default function WorkflowPage() {
                 setAudioUrl(undefined);
               },
               onGenerate: async () => {
-                if (!script.trim()) return;
+                const normalizedScript = script.trim();
+                if (!normalizedScript) {
+                  return;
+                }
                 setIsGenerating(true);
                 try {
-                  const response = await askAgent(
-                    `Generate voiceover for this script: ${script}`,
-                    "default",
+                  const response = await generateVoiceover({
+                    script: normalizedScript,
+                    avatarType: "default",
                     tone,
-                  );
-                  if ("audioUrl" in response && response.audioUrl) {
+                  });
+
+                  if (
+                    response.success &&
+                    "audioUrl" in response &&
+                    response.audioUrl
+                  ) {
+                    setScript(response.script);
                     setAudioUrl(response.audioUrl);
                     const successMsg = {
                       id: String(Date.now()),
                       role: "assistant",
-                      content: `Voice-over generated successfully with ${tone} tone!`,
+                      content: `Voice-over generated successfully with ${response.voiceType} tone!`,
                     };
                     setMessages((prev) => [...prev, successMsg]);
+                  } else {
+                    const errorMessage =
+                      "error" in response && response.error
+                        ? response.error
+                        : "Failed to generate voice-over. Please try again.";
+                    setAudioUrl(undefined);
+                    const errorMsg = {
+                      id: String(Date.now()),
+                      role: "assistant",
+                      content: errorMessage,
+                    };
+                    setMessages((prev) => [...prev, errorMsg]);
                   }
                 } catch (error) {
                   console.error("Error generating audio:", error);
+                  setAudioUrl(undefined);
                   const errorMsg = {
                     id: String(Date.now()),
                     role: "assistant",
@@ -269,7 +292,7 @@ export default function WorkflowPage() {
             data: {
               ...node.data,
               selectedTone: tone,
-              onToneSelect: (newTone: string) => {
+              onToneSelect: (newTone: VoiceTone) => {
                 setTone(newTone);
                 const toneMsg = {
                   id: String(Date.now()),

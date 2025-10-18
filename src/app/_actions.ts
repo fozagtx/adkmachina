@@ -1,6 +1,11 @@
 "use server";
 
 import { getRootAgent } from "@/agents";
+import {
+  requestVoiceoverAudio,
+  type AvatarType,
+  type VoiceTone,
+} from "@/agents/sub-agents/voiceAgent/voiceover";
 
 export interface AgentResponse {
   success: boolean;
@@ -13,6 +18,12 @@ export interface AudioAgentResponse extends AgentResponse {
   audioUrl: string;
   voiceType: string;
   avatarType: string;
+}
+
+export interface GenerateVoiceoverParams {
+  script: string;
+  avatarType?: AvatarType;
+  tone?: VoiceTone;
 }
 
 export async function askAgent(
@@ -112,4 +123,36 @@ export async function askAgent(
       error: error instanceof Error ? error.message : "Unknown error occurred",
     };
   }
+}
+
+export async function generateVoiceover({
+  script,
+  avatarType,
+  tone,
+}: GenerateVoiceoverParams): Promise<AgentResponse | AudioAgentResponse> {
+  const result = await requestVoiceoverAudio({
+    script,
+    avatarType,
+    tone,
+  });
+
+  if (result.success) {
+    return {
+      success: true,
+      content: result.script,
+      script: result.script,
+      audioUrl: result.audioUrl,
+      voiceType: result.voiceType,
+      avatarType: result.avatarType,
+    };
+  }
+
+  const errorMessage =
+    result.error || "Unable to generate voiceover. Please try again.";
+
+  return {
+    success: false,
+    content: "",
+    error: errorMessage,
+  };
 }

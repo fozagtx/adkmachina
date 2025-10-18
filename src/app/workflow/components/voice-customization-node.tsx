@@ -2,8 +2,9 @@
 
 import { Handle, Position } from "@xyflow/react";
 import { Mic } from "lucide-react";
+import type { VoiceTone } from "@/agents/sub-agents/voiceAgent/voiceover";
 
-const tones = [
+const tones: Array<{ id: VoiceTone; name: string; emoji: string }> = [
   { id: "energetic", name: "Energetic", emoji: "⚡" },
   { id: "calm", name: "Calm", emoji: "🌊" },
   { id: "professional", name: "Professional", emoji: "💼" },
@@ -12,8 +13,8 @@ const tones = [
 ];
 
 interface VoiceCustomizationNodeData {
-  selectedTone?: string;
-  onToneSelect?: (tone: string) => void;
+  selectedTone?: VoiceTone;
+  onToneSelect?: (tone: VoiceTone) => void;
 }
 
 export const VoiceCustomizationNode = ({
