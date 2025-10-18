@@ -112,11 +112,11 @@ export async function requestVoiceoverAudio(
     );
 
     if (!response.ok) {
-      const errorText = await response.text().catch(() => response.statusText);
-      console.error("ElevenLabs API error:", errorText);
+      const errorText = await response.text().catch(() => `Failed to get error text, status: ${response.statusText}`);
+      console.error(`ElevenLabs API returned status ${response.status}: ${errorText}`);
       return {
         success: false,
-        error: `ElevenLabs API error: ${errorText}`,
+        error: `ElevenLabs API error (${response.status}): ${errorText}`,
       };
     }
 
