@@ -1,13 +1,14 @@
 import { env } from "node:process";
 import { LlmAgent } from "@iqai/adk";
-import { scriptIdeationTool } from "./tools";
+import { scriptWritingTool } from "./tools";
 
 export const getScriptAgent = () => {
   const scriptAgent = new LlmAgent({
     name: "script_agent",
-    description: "generates viral script ideas and hooks for UGC content",
+    description:
+      "expands validated hooks into retention-optimized short-form video scripts",
     model: env.LLM_MODEL || "gemini-2.0-flash-exp",
-    tools: [scriptIdeationTool],
+    tools: [scriptWritingTool],
   });
 
   return scriptAgent;
