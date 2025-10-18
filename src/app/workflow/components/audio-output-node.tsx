@@ -60,7 +60,7 @@ export const AudioOutputNode = ({ data }: AudioOutputNodeProps) => {
                 console.error("Download error:", error);
               }
             }}
-            className="h-9 w-full rounded-lg bg-indigo-600 text-xs font-semibold text-white transition hover:bg-indigo-700"
+            className="h-9 w-full rounded-lg bg-gradient-to-r from-purple-800 to-black text-xs font-semibold text-white transition"
             disabled={!data.audioUrl}
           >
             Download Audio

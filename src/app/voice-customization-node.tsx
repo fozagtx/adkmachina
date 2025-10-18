@@ -4,12 +4,12 @@ import { Handle, Position } from "@xyflow/react";
 import { Mic } from "lucide-react";
 import type { VoiceTone } from "@/agents/sub-agents/voiceAgent/voiceover";
 
-const tones: Array<{ id: VoiceTone; name: string; emoji: string }> = [
-  { id: "energetic", name: "Energetic", emoji: "⚡" },
-  { id: "calm", name: "Calm", emoji: "🌊" },
-  { id: "professional", name: "Professional", emoji: "💼" },
-  { id: "funny", name: "Funny", emoji: "😄" },
-  { id: "dramatic", name: "Dramatic", emoji: "🎭" },
+const tones: Array<{ id: VoiceTone; name: string }> = [
+  { id: "energetic", name: "Energetic" },
+  { id: "calm", name: "Calm" },
+  { id: "professional", name: "Professional" },
+  { id: "funny", name: "Funny" },
+  { id: "dramatic", name: "Dramatic" },
 ];
 
 interface VoiceCustomizationNodeData {
@@ -50,7 +50,6 @@ export const VoiceCustomizationNode = ({
             }`}
             aria-label={`Select ${tone.name} tone`}
           >
-            <div className="mb-1 text-2xl">{tone.emoji}</div>
             <div className="text-xs font-medium">{tone.name}</div>
           </button>
         ))}

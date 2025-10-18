@@ -15,7 +15,12 @@ import {
 } from "@xyflow/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
-import { AlertTriangle, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  AlertTriangle,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -35,10 +40,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { VoiceTone } from "@/agents/sub-agents/voiceAgent/voiceover";
-import { askAgent, generateVoiceover } from "../_actions";
+import { askAgent } from "../_actions";
 import { AudioOutputNode } from "./components/audio-output-node";
 import { ScriptInputNode } from "./components/script-input-node";
-import { VoiceCustomizationNode } from "./components/voice-customization-node";
+import { VoiceCustomizationNode } from "../voice-customization-node";
+import { AnimatedText } from "@/components/ui/animated-text";
+import { Popup } from "@/components/ui/popup";
 
 const nodeTypes: NodeTypes = {
   scriptInput: ScriptInputNode,
@@ -150,6 +157,10 @@ export default function WorkflowPage() {
   const [error, setError] = useState<Error | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [notification, setNotification] = useState<{
+    message: string;
+    show: boolean;
+  }>({ message: "", show: false });
 
   const handleSubmit = async () => {
     if (!input.trim() || status === "submitted") return;
@@ -228,11 +239,11 @@ export default function WorkflowPage() {
                 }
                 setIsGenerating(true);
                 try {
-                  const response = await generateVoiceover({
-                    script: normalizedScript,
-                    avatarType: "default",
+                  const response = await askAgent(
+                    normalizedScript,
+                    "default",
                     tone,
-                  });
+                  );
 
                   if (
                     response.success &&
@@ -294,12 +305,13 @@ export default function WorkflowPage() {
               selectedTone: tone,
               onToneSelect: (newTone: VoiceTone) => {
                 setTone(newTone);
-                const toneMsg = {
-                  id: String(Date.now()),
-                  role: "assistant",
-                  content: `Voice tone changed to ${newTone}. Generate voice-over to apply this tone.`,
-                };
-                setMessages((prev) => [...prev, toneMsg]);
+                setNotification({
+                  message: `Voice selected: ${newTone}`,
+                  show: true,
+                });
+                setTimeout(() => {
+                  setNotification({ message: "", show: false });
+                }, 5000);
               },
             },
           };
@@ -318,7 +330,8 @@ export default function WorkflowPage() {
   }, [messages, status, error]);
 
   return (
-    <div className="flex h-screen flex-col gap-4 bg-[#D3D1DE] p-4 lg:flex-row">
+    <div className="flex h-screen flex-col gap-4 bg-gradient-to-br from-pink-100 via-pink-50 to-rose-100 p-4 lg:flex-row">
+      <Popup message={notification.message} show={notification.show} />
       <aside
         className={cn(
           "relative flex w-full max-h-[40vh] flex-shrink-0 flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-xl transition-all duration-300 ease-in-out lg:max-h-full",
@@ -333,7 +346,7 @@ export default function WorkflowPage() {
         >
           {!isSidebarCollapsed && (
             <span className="text-sm font-semibold text-gray-700">
-              AI Assistant
+              UGC Agent
             </span>
           )}
           <Button
@@ -344,7 +357,7 @@ export default function WorkflowPage() {
               isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
             }
             aria-pressed={isSidebarCollapsed}
-            className="rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200"
+            className="rounded-full bg-gradient-to-r from-purple-800 to-black text-white"
           >
             {isSidebarCollapsed ? (
               <ChevronRight className="size-5" />
@@ -364,10 +377,11 @@ export default function WorkflowPage() {
             <ChatContainerContent className="space-y-12 px-4 py-12">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
-                  <p className="text-sm">
-                    Ask the AI to generate scripts or voice-overs, or use the
-                    workflow nodes to create content.
-                  </p>
+                  <AnimatedText
+                    staticText="ideate viral"
+                    animatedTexts={["hooks", "content piece", "voiceover"]}
+                    className="text-center"
+                  />
                 </div>
               )}
               {messages.map((message, index) => {
@@ -482,7 +496,7 @@ export default function WorkflowPage() {
                         (status !== "ready" && status !== "error")
                       }
                       onClick={handleSubmit}
-                      className="size-9 rounded-full"
+                      className="size-9 rounded-full bg-gradient-to-r from-purple-800 to-black text-white"
                     >
                       {status === "ready" || status === "error" ? (
                         <ArrowUp size={18} />

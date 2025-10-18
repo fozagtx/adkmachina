@@ -57,7 +57,7 @@ export const ScriptInputNode = ({
       <Button
         onClick={data.onGenerate || (() => {})}
         disabled={!data.script?.trim() || data.isGenerating}
-        className="mt-3 h-9 w-full rounded-lg bg-gray-800 text-xs font-semibold text-white transition hover:bg-gray-900"
+        className="mt-3 h-9 w-full rounded-lg bg-gradient-to-r from-purple-800 to-black text-xs font-semibold text-white transition"
       >
         {data.isGenerating ? "Generating..." : "Generate Voice-Over"}
       </Button>
