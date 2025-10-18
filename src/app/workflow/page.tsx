@@ -13,7 +13,7 @@ import {
   useEdgesState,
   useNodesState,
 } from "@xyflow/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "@xyflow/react/dist/style.css";
 import { AlertTriangle, ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
 import {
@@ -148,6 +148,7 @@ export default function WorkflowPage() {
   );
   const [error, setError] = useState<Error | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   const handleSubmit = async () => {
     if (!input.trim() || status === "submitted") return;
@@ -289,6 +290,10 @@ export default function WorkflowPage() {
     updateNodes();
   }, [updateNodes]);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, status, error]);
+
   return (
     <div className="flex h-screen flex-col gap-4 bg-[#D3D1DE] p-4 lg:flex-row">
       <aside
@@ -328,11 +333,11 @@ export default function WorkflowPage() {
 
         <div
           className={cn(
-            "flex flex-1 flex-col",
+            "flex min-h-0 flex-1 flex-col",
             isSidebarCollapsed && "hidden",
           )}
         >
-          <ChatContainerRoot className="relative flex-1 space-y-0 overflow-y-auto">
+          <ChatContainerRoot className="relative flex-1 min-h-0 overflow-y-auto">
             <ChatContainerContent className="space-y-12 px-4 py-12">
               {messages.length === 0 && (
                 <div className="text-center text-gray-500 py-8">
@@ -428,6 +433,7 @@ export default function WorkflowPage() {
                   </div>
                 </PromptMessage>
               )}
+              <div ref={messagesEndRef} className="h-px w-full shrink-0" />
             </ChatContainerContent>
           </ChatContainerRoot>
           <div className="inset-x-0 bottom-0 mx-auto w-full max-w-3xl shrink-0 px-3 pb-3 md:px-5 md:pb-5">
