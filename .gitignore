@@ -2,6 +2,9 @@
 /node_modules
 /.pnp
 .pnp.*
+
+# logs
+npm_output.log
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

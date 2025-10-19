@@ -252,12 +252,6 @@ export default function WorkflowPage() {
                   ) {
                     setScript(response.script);
                     setAudioUrl(response.audioUrl);
-                    const successMsg = {
-                      id: String(Date.now()),
-                      role: "assistant",
-                      content: `Voice-over generated successfully with ${response.voiceType} tone!`,
-                    };
-                    setMessages((prev) => [...prev, successMsg]);
                   } else {
                     const errorMessage =
                       "error" in response && response.error
@@ -294,6 +288,22 @@ export default function WorkflowPage() {
             data: {
               ...node.data,
               audioUrl,
+              onLoadSuccess: () => {
+                const successMsg = {
+                  id: String(Date.now()),
+                  role: "assistant",
+                  content: `Voice-over generated successfully with ${tone} tone!`,
+                };
+                setMessages((prev) => [...prev, successMsg]);
+              },
+              onLoadError: () => {
+                const errorMsg = {
+                  id: String(Date.now()),
+                  role: "assistant",
+                  content: "Failed to load audio. Please try again.",
+                };
+                setMessages((prev) => [...prev, errorMsg]);
+              },
             },
           };
         }
