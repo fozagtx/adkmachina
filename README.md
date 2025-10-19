@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Relo AI
 
-## Getting Started
+Multi-agent platform for User Generated Content (UGC) creation.
 
-First, run the development server:
+![Relo AI](./public/landing_page_after_fix.png)
+
+## Demo
+
+[Watch a demo of Relo AI in action](./public/delight.mp4)
+
+## What It Does
+
+Relo AI gives you two AI agents that work together to create viral-ready UGC content:
+
+**Hook Agent** - Optimizes your hooks to be scroll-stopping and engaging.
+
+**Script Agent** - Expands your hooks into a structured, retention-optimized script.
+
+**Voice Over Generation** - Generates high-quality voice over for your scripts using ElevenLabs API.
+
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+git clone <your-repo-url>
+cd relo-ai
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Set up your `.env` file:
+```
+GOOGLE_API_KEY=your_key
+ELEVENLABS_API_KEY=your_key
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Core Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Multi-agent architecture:** Specialized agents for each step of the content creation process.
+- **Interactive chat UI:** Chat with the agents to refine your ideas.
+- **Workflow editor:** Visualize and manage the content creation workflow.
+- **High-quality voice over:** Generate realistic voice over for your scripts.
 
-## Learn More
+## How It Works
 
-To learn more about Next.js, take a look at the following resources:
+The Hook Agent helps you craft catchy hooks for your videos. Once you have a hook, the Script Agent expands it into a full script. Finally, you can generate a voice over for your script using the integrated ElevenLabs API.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Tech Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Next.js:** React framework for building the user interface.
+- **TypeScript:** Typed superset of JavaScript.
+- **Tailwind CSS:** Utility-first CSS framework.
+- **@iqai/adk:** Agent Development Kit for building AI agents.
+- **ElevenLabs:** API for generating high-quality voice over.
+- **React Flow:** Library for building node-based editors.
 
-## Deploy on Vercel
+## Use Cases
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Create scripts for TikTok, Instagram Reels, and YouTube Shorts.
+- Generate voice over for your videos.
+- Brainstorm ideas for new content.
+- Learn how to write better hooks and scripts.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Documentation
+
+The platform is designed to be self-explanatory through the interactive chat interface. The agents will guide you through the process of creating content.

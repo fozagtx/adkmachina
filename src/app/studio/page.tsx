@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+
 import {
   ChatContainerContent,
   ChatContainerRoot,
@@ -39,18 +40,15 @@ import {
 } from "@/components/prompt-kit/prompt-input";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { VoiceTone } from "@/agents/sub-agents/voiceAgent/voiceover";
 import { askAgent } from "../_actions";
 import { AudioOutputNode } from "./components/audio-output-node";
 import { ScriptInputNode } from "./components/script-input-node";
-import { VoiceCustomizationNode } from "../voice-customization-node";
 import { AnimatedText } from "@/components/ui/animated-text";
 import { Popup } from "@/components/ui/popup";
 
 const nodeTypes: NodeTypes = {
   scriptInput: ScriptInputNode,
   audioOutput: AudioOutputNode,
-  voiceCustomization: VoiceCustomizationNode,
 };
 
 type WorkflowData = {
@@ -61,8 +59,6 @@ type WorkflowData = {
   onGenerate?: () => void;
   isGenerating?: boolean;
   audioUrl?: string;
-  selectedTone?: VoiceTone;
-  onToneSelect?: (tone: VoiceTone) => void;
 };
 
 type CustomNode = Node<WorkflowData>;
@@ -85,20 +81,9 @@ const initialNodes: CustomNode[] = [
     style: { width: "clamp(240px, 32vw, 340px)" },
   },
   {
-    id: "3",
-    type: "voiceCustomization",
-    position: { x: 450, y: 150 },
-    data: {
-      selectedTone: "professional",
-      onToneSelect: () => {},
-    },
-    dragHandle: ".drag-handle",
-    style: { width: "clamp(220px, 28vw, 320px)" },
-  },
-  {
     id: "2",
     type: "audioOutput",
-    position: { x: 850, y: 150 },
+    position: { x: 450, y: 150 },
     data: {
       audioUrl: undefined,
     },
@@ -109,24 +94,8 @@ const initialNodes: CustomNode[] = [
 
 const initialEdges: Edge[] = [
   {
-    id: "e1-3",
+    id: "e1-2",
     source: "1",
-    target: "3",
-    type: "smoothstep",
-    animated: true,
-    style: {
-      stroke: "#6366f1",
-      strokeWidth: 3,
-      strokeDasharray: "5 5",
-    },
-    markerEnd: {
-      type: MarkerType.Arrow,
-      color: "#6366f1",
-    },
-  },
-  {
-    id: "e3-2",
-    source: "3",
     target: "2",
     type: "smoothstep",
     animated: true,
@@ -146,7 +115,6 @@ export default function WorkflowPage() {
   const [script, setScript] = useState("");
   const [audioUrl, setAudioUrl] = useState<string | undefined>();
   const [isGenerating, setIsGenerating] = useState(false);
-  const [tone, setTone] = useState<VoiceTone>("professional");
   const [messages, setMessages] = useState<
     { id: string; role: string; content: string }[]
   >([]);
@@ -176,7 +144,7 @@ export default function WorkflowPage() {
     setError(null);
 
     try {
-      const response = await askAgent(input, "default", tone);
+      const response = await askAgent(input);
       const assistantMessage = {
         id: String(Date.now() + 1),
         role: "assistant",
@@ -184,10 +152,7 @@ export default function WorkflowPage() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
-      if ("audioUrl" in response && response.audioUrl) {
-        setScript(response.script);
-        setAudioUrl(response.audioUrl);
-      } else if ("script" in response && response.script) {
+      if ("script" in response && response.script) {
         setScript(response.script);
       }
       setStatus("ready");
@@ -239,32 +204,21 @@ export default function WorkflowPage() {
                 }
                 setIsGenerating(true);
                 try {
-                  const response = await askAgent(
-                    normalizedScript,
-                    "default",
-                    tone,
-                  );
+                  const response = await fetch("/api/voiceover", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ text: normalizedScript }),
+                  });
 
-                  if (
-                    response.success &&
-                    "audioUrl" in response &&
-                    response.audioUrl
-                  ) {
-                    setScript(response.script);
-                    setAudioUrl(response.audioUrl);
-                  } else {
-                    const errorMessage =
-                      "error" in response && response.error
-                        ? response.error
-                        : "Failed to generate voice-over. Please try again.";
-                    setAudioUrl(undefined);
-                    const errorMsg = {
-                      id: String(Date.now()),
-                      role: "assistant",
-                      content: errorMessage,
-                    };
-                    setMessages((prev) => [...prev, errorMsg]);
+                  if (!response.ok) {
+                    throw new Error("Failed to generate voice over");
                   }
+
+                  const audioBlob = await response.blob();
+                  const audioUrl = URL.createObjectURL(audioBlob);
+                  setAudioUrl(audioUrl);
                 } catch (error) {
                   console.error("Error generating audio:", error);
                   setAudioUrl(undefined);
@@ -307,29 +261,10 @@ export default function WorkflowPage() {
             },
           };
         }
-        if (node.id === "3") {
-          return {
-            ...node,
-            data: {
-              ...node.data,
-              selectedTone: tone,
-              onToneSelect: (newTone: VoiceTone) => {
-                setTone(newTone);
-                setNotification({
-                  message: `Voice selected: ${newTone}`,
-                  show: true,
-                });
-                setTimeout(() => {
-                  setNotification({ message: "", show: false });
-                }, 5000);
-              },
-            },
-          };
-        }
         return node;
       }),
     );
-  }, [script, audioUrl, isGenerating, tone, setNodes]);
+  }, [script, audioUrl, isGenerating, setNodes]);
 
   useEffect(() => {
     updateNodes();
@@ -355,9 +290,22 @@ export default function WorkflowPage() {
           )}
         >
           {!isSidebarCollapsed && (
-            <span className="text-sm font-semibold text-gray-700">
-              UGC Agent
-            </span>
+            <div className="flex items-center gap-2">
+              <video
+                src="/delight.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-12 h-12 rounded-full object-cover"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold">Relo</span>
+                <span className="rounded-md border border-black px-2 py-1 text-sm font-bold">
+                  AI
+                </span>
+              </div>
+            </div>
           )}
           <Button
             variant="ghost"
@@ -406,7 +354,7 @@ export default function WorkflowPage() {
                     )}
                   >
                     {isAssistant ? (
-                      <div className="group flex w-full flex-col gap-0">
+                      <div className="group flex w-full flex-col gap-2">
                         <MessageContent
                           className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
                           markdown={true}

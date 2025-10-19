@@ -45,7 +45,18 @@ export const MessageComponent = memo(
         )}
       >
         {isAssistant ? (
-          <div className="group flex w-full flex-col gap-0">
+          <div className="group flex w-full flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <video
+                src="/delight.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="size-8 rounded-full"
+              />
+              <span className="font-semibold text-black">Jenny AI</span>
+            </div>
             <MessageContent
               className="text-foreground prose w-full min-w-0 flex-1 rounded-lg bg-transparent p-0"
               markdown

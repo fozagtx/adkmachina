@@ -1,38 +1,48 @@
-import { ArrowRight, Circle } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { Header } from "@/components/Header";
 
 export default function LandingPage() {
   return (
-    <div className="relative flex min-h-screen flex-col text-white">
-      {/* Background image */}
-      <div className="absolute inset-0 -z-10">
-        <Image
-          src="/noice.png"
-          alt="Background"
-          fill
-          className="object-cover object-center brightness-25 "
-          priority
-        />
-      </div>
-
-      <Header />
-      <main className="flex flex-1 animate-fade_in flex-col items-center justify-center p-6 text-center">
-        <div className="flex flex-col items-center space-y-4">
-          <p className="text-lg text-black animate-pulse font-bold">
-            Built on ADKTS
-          </p>
-          <h1 className="text-5xl font-bold tracking-tight md:text-7xl text-black">
-            Automate UGC Content.
-          </h1>
-          <Link
-            href="/studio"
-            className="group mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-purple-800 to-black px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl hover:ring-2 hover:ring-purple-500 hover:ring-offset-2 hover:ring-offset-pink-100"
-          >
-            <span>Start Automating</span>
-            <ArrowRight className="size-5 transition-transform duration-300 group-hover:translate-x-1" />
-          </Link>
+    <div className="flex min-h-screen flex-col bg-white text-black">
+      <header className="flex items-center justify-between p-6">
+        <div className="flex items-center gap-2">
+          <span className="text-2xl font-bold">Relo</span>
+          <span className="rounded-md border border-black px-2 py-1 text-sm font-bold">
+            Studio
+          </span>
+        </div>
+      </header>
+      <main className="flex flex-1 flex-col items-center justify-center p-6 text-center">
+        <div className="flex max-w-6xl items-center justify-between">
+          <div className="flex flex-col items-start space-y-6 text-left">
+            <h1 className="text-6xl font-bold tracking-tight">
+              Let work find you
+            </h1>
+            <p className="max-w-md text-lg text-gray-600">
+              Relo AI quietly discovers opportunities through your existing
+              network, empowering you to grow your career. Included with Contra
+              Pro.
+            </p>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/studio"
+                className="group inline-flex items-center justify-center gap-2 rounded-full bg-black px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl"
+              >
+                <span>Get started</span>
+              </Link>
+            </div>
+          </div>
+          <div className="relative">
+            <video
+              src="/delight.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-[500px] h-[500px] rounded-full object-cover"
+            />
+          </div>
         </div>
       </main>
     </div>
