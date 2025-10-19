@@ -1,6 +1,8 @@
 # Relo AI
 
 Multi-agent platform for User Generated Content (UGC) creation.
+![Relo AI Logo](/clickable_button_verification)
+
 
 ## Demo
 
