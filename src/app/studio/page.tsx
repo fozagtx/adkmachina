@@ -246,7 +246,7 @@ export default function WorkflowPage() {
                 const successMsg = {
                   id: String(Date.now()),
                   role: "assistant",
-                  content: `Voice-over generated successfully with ${tone} tone!`,
+                  content: `Voice-over generated successfully with tone!`,
                 };
                 setMessages((prev) => [...prev, successMsg]);
               },
