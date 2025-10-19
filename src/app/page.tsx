@@ -17,12 +17,11 @@ export default function LandingPage() {
         <div className="flex max-w-6xl items-center justify-between">
           <div className="flex flex-col items-start space-y-6 text-left">
             <h1 className="text-6xl font-bold tracking-tight">
-              Let work find you
+              Create UGC faster
             </h1>
             <p className="max-w-md text-lg text-gray-600">
-              Relo AI quietly discovers opportunities through your existing
-              network, empowering you to grow your career. Included with Contra
-              Pro.
+              Relo AI quietly , ideates, plans UGC content for users from idea
+              to voiceover pluf filming advice .
             </p>
             <div className="flex items-center gap-4">
               <Link
