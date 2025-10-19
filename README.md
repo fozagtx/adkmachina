@@ -1,7 +1,7 @@
 # Relo AI
 
 Multi-agent platform for User Generated Content (UGC) creation.
-![Relo AI Logo](/clickable_button_verification.png)
+![Relo AI Logo](/dashb.png)
 
 
 ## Demo
@@ -86,17 +86,6 @@ ELEVENLABS_API_KEY=your_key
 
 ---
 
-## 🧠 Tech Stack
-
-<p align="left">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="40" height="40" alt="Next.js" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="40" height="40" alt="TypeScript" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40" alt="React" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40" alt="Tailwind CSS" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40" alt="Node.js" />
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" width="40" height="40" alt="Git" />
-</p>
-
 * **Next.js** – React framework for fast, modern web apps
 * **TypeScript** – Strongly typed language for scalable code
 * **Tailwind CSS** – Utility-first styling
@@ -112,4 +101,3 @@ ELEVENLABS_API_KEY=your_key
 * Generate voiceovers for scripts automatically
 * Brainstorm fresh hooks and video ideas
 * Learn how to write viral hooks that retain attention
-
