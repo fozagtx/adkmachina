@@ -21,7 +21,7 @@ export default function LandingPage() {
             </h1>
             <p className="max-w-md text-lg text-gray-600">
               Relo AI quietly , ideates, plans UGC content for users from idea
-              to voiceover pluf filming advice .
+              to voiceover plus filming advice .
             </p>
             <div className="flex items-center gap-4">
               <Link

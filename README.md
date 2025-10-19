@@ -1,12 +1,13 @@
 # Relo AI
 
 Multi-agent platform for User Generated Content (UGC) creation.
+
 ![Relo AI Logo](/dashb.png)
 
 
 ## Demo
 
-[🎥 Watch a demo of Relo AI in action](./public/delight.mp4)
+[🎥 Watch a demo of Relo AI in action](.)
 
 
 ## What It Does
