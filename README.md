@@ -1,8 +1,3 @@
-Nice touch — adding the official tech logos in your **Tech Stack** section makes the README more visual and professional.
-Here’s your **Relo AI README** updated to include **logo icons via CDN**, using clean Markdown and HTML combo (for layout and sizing consistency).
-
----
-
 # Relo AI
 
 Multi-agent platform for User Generated Content (UGC) creation.
@@ -121,6 +116,3 @@ ELEVENLABS_API_KEY=your_key
 * Brainstorm fresh hooks and video ideas
 * Learn how to write viral hooks that retain attention
 
----
-
-Would you like me to add icons for **@iqai/adk**, **ElevenLabs**, and **React Flow** too (they don’t have official ones on Devicon, but I can use SVGs or shields.io badges)? That’ll make it look completely uniform.
