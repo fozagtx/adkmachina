@@ -63,7 +63,7 @@ Relo AI gives you two AI agents that work together to create viral-ready UGC con
 ## Quick Start
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/fozagtx/adkmachina
 cd relo-ai
 pnpm install
 pnpm dev
