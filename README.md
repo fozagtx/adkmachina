@@ -2,15 +2,10 @@
 
 Multi-agent platform for User Generated Content (UGC) creation.
 
-<video src="./public/delight.mp4" controls autoplay loop muted width="640">
-  Your browser does not support the video tag.
-</video>
-
 ## Demo
 
 [🎥 Watch a demo of Relo AI in action](./public/delight.mp4)
 
----
 
 ## What It Does
 
