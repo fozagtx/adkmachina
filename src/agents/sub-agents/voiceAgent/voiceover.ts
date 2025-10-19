@@ -72,61 +72,11 @@ export async function requestVoiceoverAudio(
     };
   }
 
-  if (!ELEVENLABS_API_KEY) {
-    const missingKeyMessage =
-      "Missing ELEVENLABS_API_KEY environment variable. Audio generation requires a valid ElevenLabs API key.";
-    console.error(missingKeyMessage);
-    return {
-      success: false,
-      error: missingKeyMessage,
-    };
-  }
-
   try {
-    console.log("Generating voiceover with params:", {
-      scriptLength: normalizedScript.length,
-      avatarType,
-      tone,
-    });
-
     const voiceId = selectVoiceId(tone, avatarType);
-    console.log("Selected voice ID:", voiceId);
-
-    const response = await fetch(
-      `${ELEVENLABS_BASE_URL}/text-to-speech/${voiceId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": ELEVENLABS_API_KEY,
-        },
-        body: JSON.stringify({
-          text: normalizedScript,
-          model_id: "eleven_turbo_v2",
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-          },
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text().catch(() => `Failed to get error text, status: ${response.statusText}`);
-      console.error(`ElevenLabs API returned status ${response.status}: ${errorText}`);
-      return {
-        success: false,
-        error: `ElevenLabs API error (${response.status}): ${errorText}`,
-      };
-    }
-
-    console.log("API response received, processing audio buffer...");
-    const audioBuffer = await response.arrayBuffer();
-    console.log("Audio buffer size:", audioBuffer.byteLength, "bytes");
-
-    const base64Audio = Buffer.from(audioBuffer).toString("base64");
-    const audioUrl = `data:audio/mpeg;base64,${base64Audio}`;
-    console.log("Generated data URL for audio.");
+    const audioUrl = `/api/elevenlabs?text=${encodeURIComponent(
+      normalizedScript,
+    )}&voiceId=${voiceId}`;
 
     return {
       success: true,

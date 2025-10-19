@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 interface AudioOutputNodeProps {
   data: {
     audioUrl?: string | null;
+    onLoadSuccess?: () => void;
+    onLoadError?: () => void;
   };
 }
 
@@ -33,15 +35,13 @@ export const AudioOutputNode = ({ data }: AudioOutputNodeProps) => {
             <audio
               controls
               className="w-full"
+              onCanPlayThrough={data.onLoadSuccess}
               onError={(e) => {
                 console.error("Audio playback error:", e);
+                data.onLoadError?.();
               }}
             >
-              <source
-                src={data.audioUrl || ""}
-                type="audio/mpeg"
-                onError={(e) => console.error("Source error:", e)}
-              />
+              <source src={data.audioUrl || ""} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
           </div>
