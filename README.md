@@ -7,7 +7,7 @@ Multi-agent platform for User Generated Content (UGC) creation.
 
 ## Demo
 
-[🎥 Watch a demo of Relo AI in action](.)
+[🎥 Watch a demo of Relo AI in action](https://youtu.be/eWtaS7HD-a8)
 
 
 ## What It Does
