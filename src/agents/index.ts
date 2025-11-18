@@ -14,7 +14,7 @@ export const getRootAgent = () => {
     .withInstruction(
       "Start by calling the hook agent to craft scroll-stopping openings and pattern interrupts. Once a direction is chosen, collaborate with the script agent to expand the hook into a structured, retention-optimized script. Support avatar types (fitness, beauty, tech, lifestyle) and deliver 15-60 second content with clear CTAs.",
     )
-    .withModel(env.LLM_MODEL || "gemini-2.0-flash-exp")
+    .withModel(env.LLM_MODEL || "gpt-4o")
     .withSubAgents([hookAgent, scriptAgent])
     .build();
 };

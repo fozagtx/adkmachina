@@ -7,7 +7,7 @@ export const getHookAgent = () => {
     name: "hook_agent",
     description:
       "creates scroll-stopping hooks and pattern interrupts for viral short-form content",
-    model: env.LLM_MODEL || "gemini-2.0-flash-exp",
+    model: env.LLM_MODEL || "gpt-4o",
     tools: [hookGenerationTool],
   });
 
